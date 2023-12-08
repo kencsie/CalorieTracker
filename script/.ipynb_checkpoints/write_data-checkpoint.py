@@ -7,19 +7,19 @@ from tempfile import NamedTemporaryFile
 
 # Global Constants
 FOOD_ID_DICT = {
-        '0': "Apple (Sliced)",
-        '1': "Cabbage",
-        '2': "Coin",
-        '3': "Creamy Tofu",
-        '4': "Cucumber",
-        '5': "Dragon Fruit",
-        '6': "Firm Tofu",
-        '7': "Fish",
-        '8': "Guava (Sliced)",
-        '9': "Pumpkin",
-        '10': "Red Braised Pork",
-        '11': "Soy Egg",
-        '12': "Steamed Egg"
+        0: "Apple (Sliced)",
+        1: "Cabbage",
+        2: "Coin",
+        3: "Creamy Tofu",
+        4: "Cucumber",
+        5: "Dragon Fruit",
+        6: "Firm Tofu",
+        7: "Fish",
+        8: "Guava (Sliced)",
+        9: "Pumpkin",
+        10: "Red Braised Pork",
+        11: "Soy Egg",
+        12: "Steamed Egg"
 }
 
 
@@ -74,7 +74,7 @@ def prompt_iterations():
 
 def prompt_range():
     start, end = input("Enter the start and end time of day range \
-separated by spaces (eg: 115433 123355): ").split()
+            separated by spaces (eg: 115433 123355): ").split()
     return (start, end)
 
 
@@ -83,16 +83,14 @@ def clear_screen():
 
 
 def prompt_mass(id_set):
-    #clear_screen()
+    clear_screen()
 
     # Show the food items present in the image
-    print("The food items present in the image are as follows:")
-    print("--------------------")
+    print("The food items present in the image are as follows:\n\n")
     for index, food_id in enumerate(id_set):
-        print(f"{index + 1}) {FOOD_ID_DICT[food_id[:-2]]}")
+        print(f"{index + 1}) {FOOD_ID_DICT[food_id]}\n\n")
 
     # Obtain masses as list
-    print("--------------------")
     print("Enter mass values separated by spaces (eg: 12 34 11 58): ")
     mass_list = [int(mass) for mass in input().split()]
 
@@ -127,14 +125,13 @@ def process_date_with_image(csv_file_path, date, user_profile):
             for row in reader:
                 image_name = row['image_name']
                 match = re.search(user_profile['re_exp'], image_name)
-                if match:
-                    img_date = match.group('date')
-                    img_time = match.group('time')
+                img_date = match.group('date')
+                img_time = match.group('time')
 
-                    # Find entries within time range and store ID
-                    if (date == img_date) and (start <= img_time <= end):
-                        print(f"Storing ID for {image_name}...")
-                        id_set.add(row['object_id'])
+                # Find entries within time range and store ID
+                if (date == img_date) and (start <= img_time <= end):
+                    print(f"Storing ID for {image_name}...")
+                    id_set.add(row['object_id'])
 
         # Obtain dictionary of masses (for current iteration)
         mass_dict = prompt_mass(sorted(id_set))
@@ -146,29 +143,24 @@ def process_date_with_image(csv_file_path, date, user_profile):
             for row in reader:
                 image_name = row['image_name']
                 match = re.search(user_profile['re_exp'], image_name)
-                if match:
-                    img_date = match.group('date')
-                    img_time = match.group('time')
+                img_date = match.group('date')
+                img_time = match.group('time')
 
-                    # If image dates match and times are in range, update that row
-                    if (date == img_date) and (start <= img_time <= end):
-                        print(f"Updating mass for {FOOD_ID_DICT[row['object_id'][:-2]]}\
-                                in image {image_name}...")
-                        row['mass'] = mass_dict.get(row['object_id'])
+                # If image dates match and times are in range, update that row
+                if (date == img_date) and (start <= img_time <= end):
+                    print(f"Updating mass for {FOOD_ID_DICT[row['object_id']]}\
+                            in image {image_name}...")
+                    row['mass'] = mass_dict.get(row['object_id'])
 
-                        row_list.append(row)
-                        #print(f'row:{row}\n\n')
+                row_list.add(row)
 
     return row_list
 
 
 def write_to_csv(csv_file_path, data_list):
-    fieldnames = data_list[0].keys()
-
     # Write data to a CSV file using temporary file
     with NamedTemporaryFile(mode='w', delete=False) as ntf:
-        writer = csv.DictWriter(ntf, fieldnames=fieldnames)
-        writer.writeheader()
+        writer = csv.DictWriter(ntf)
         writer.writerows(data_list)  # Write rows to temp file
 
     # Overwrite the original csv file with the temp file
@@ -191,12 +183,10 @@ def main():
     data_list = list()
     for date in unfin_dates:
         print(f'date:{date}')
-        row_data = process_date_with_image(csv_file_path, date, user_profile)
-        #print(f'row_data:{row_data}\n\n\n')
-        data_list.extend(row_data)
+        row_data = process_date_with_image(date, user_profile)
+        data_list.append(row_data)
 
     # Write data to CSV
-    print(f'data_list:{data_list}')
     write_to_csv(csv_file_path, data_list)
 
 

@@ -1,9 +1,11 @@
 import os
+from time import sleep
 import re
 import csv
 from shutil import move
 from subprocess import call
-from tempfile import NamedTemporaryFile
+import tempfile
+from collections import deque
 
 # Global Constants
 FOOD_ID_DICT = {
@@ -152,27 +154,44 @@ def process_date_with_image(csv_file_path, date, user_profile):
 
                     # If image dates match and times are in range, update that row
                     if (date == img_date) and (start <= img_time <= end):
-                        print(f"Updating mass for {FOOD_ID_DICT[row['object_id'][:-2]]}\
-                                in image {image_name}...")
+                        print(f"Updating mass for {FOOD_ID_DICT[row['object_id'][:-2]]} in image {image_name}...")
                         row['mass'] = mass_dict.get(row['object_id'])
-
-                row_list.append(row)
-                #print(f'row:{row}\n\n')
+                        row_list.append(row)  # Only write the modified rows
+                        #print(f'row:{row}\n\n')
 
     return row_list
 
 
+def comp_dict(a: dict, b: dict):
+    return a['image_name'] == b['image_name'] and a['object_id'] == b['object_id']
+
+
 def write_to_csv(csv_file_path, data_list):
-    fieldnames = data_list[0].keys()
+    # Convert data_list to queue
+    data_queue = deque(data_list)
+
+    fieldnames = [item for item in data_list[0].keys()]
 
     # Write data to a CSV file using temporary file
-    with NamedTemporaryFile(mode='w', delete=False) as ntf:
-        writer = csv.DictWriter(ntf, fieldnames=fieldnames)
+    fd, temp_path = tempfile.mkstemp()
+    with open(csv_file_path, mode='r', newline='') as csvfile, open(temp_path, mode='w', newline='') as temp:
+        reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+        writer = csv.DictWriter(temp, fieldnames=fieldnames)
         writer.writeheader()
-        writer.writerows(data_list)  # Write rows to temp file
+
+        # Access every row in csv and check for match with unique attributes (name and object_id)
+        for row in reader:
+            line = row
+            if data_queue:                         # Queue not empty
+                if comp_dict(row, data_queue[0]):  # Rows match
+                    line = data_queue[0]           # Change the line to be written
+                    data_queue.popleft()           # Dequeue front
+
+            writer.writerow(line)                  # Write the appropriate line
 
     # Overwrite the original csv file with the temp file
-    move(ntf.name, csv_file_path)
+    move(temp_path, csv_file_path)
+    os.close(fd)
 
 
 def debug_func(csv_file_path, user_profile):

@@ -156,8 +156,8 @@ def process_date_with_image(csv_file_path, date, user_profile):
                                 in image {image_name}...")
                         row['mass'] = mass_dict.get(row['object_id'])
 
-                        row_list.append(row)
-                        #print(f'row:{row}\n\n')
+                row_list.append(row)
+                #print(f'row:{row}\n\n')
 
     return row_list
 

@@ -7,7 +7,7 @@ from tempfile import NamedTemporaryFile
 from collections import deque
 
 # Global Constants
-FOOD_ID_DICT = {
+FOOD_ID_DICT = {  # TODO: Update to reflect current food classes
         '0': "Apple (Sliced)",
         '1': "Cabbage",
         '2': "Coin",

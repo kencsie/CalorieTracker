@@ -1,7 +1,7 @@
 import os
 import re
 import csv
-from shutil import move
+import shutil
 from subprocess import call
 from tempfile import NamedTemporaryFile
 
@@ -109,6 +109,8 @@ def prompt_mass(id_set):
 def process_date_with_image(csv_file_path, date, user_profile):
     # Process a date that has an associated image
     iterations = prompt_iterations()
+    row_list = list()  # Store data rows to be written to csv
+    
     for _ in range(iterations):
         # Here you would implement the logic for obtaining a range and mass values
         # and then appending new lines with this mass information to the CSV
@@ -118,7 +120,6 @@ def process_date_with_image(csv_file_path, date, user_profile):
         (start, end) = prompt_range()
 
         id_set = set()     # Store food IDs
-        row_list = list()  # Store data rows to be written to csv
 
         # Obtain food IDs within the given range
         with open(csv_file_path, 'r') as csvfile:
@@ -162,17 +163,41 @@ def process_date_with_image(csv_file_path, date, user_profile):
     return row_list
 
 
+import csv
+import os
+import tempfile
+
 def write_to_csv(csv_file_path, data_list):
-    fieldnames = data_list[0].keys()
+    # Convert data_list to a dictionary using a composite key
+    data_dict = {(row['image_name'], row['object_id']): row for row in data_list}
 
-    # Write data to a CSV file using temporary file
-    with NamedTemporaryFile(mode='w', delete=False) as ntf:
-        writer = csv.DictWriter(ntf, fieldnames=fieldnames)
+    # Create a temporary file
+    temp_file, temp_file_path = tempfile.mkstemp()
+
+    with open(csv_file_path, 'r', newline='') as csv_file, open(temp_file_path, 'w', newline='') as tf:
+        reader = csv.DictReader(csv_file)
+        writer = csv.DictWriter(tf, fieldnames=reader.fieldnames)
+
         writer.writeheader()
-        writer.writerows(data_list)  # Write rows to temp file
 
-    # Overwrite the original csv file with the temp file
-    move(ntf.name, csv_file_path)
+        for row in reader:
+            # Create a composite key from the current row
+            key = (row['image_name'], row['object_id'])
+
+            # Check if the composite key is in data_dict (i.e., it's a modified row)
+            if key in data_dict:
+                # Write the modified row from data_dict
+                writer.writerow(data_dict[key])
+            else:
+                # Write the original row
+                writer.writerow(row)
+
+    # Close the temporary file
+    os.close(temp_file)
+
+    # Replace the original file with the updated temporary file
+    shutil.move(temp_file_path, csv_file_path)
+
 
 
 def debug_func(csv_file_path, user_profile):

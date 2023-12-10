@@ -154,10 +154,6 @@ def process_images_and_create_masks(dataset_path, csv_file):
             image_name = os.path.splitext(image_file)[0]
             adjusted_image_name = adjust_image_name(image_name)
 
-            IMAGE_PATH = os.path.join(image_folder_path, image_file)
-            image_bgr = cv2.imread(IMAGE_PATH)
-            image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
-
             info = []
             need_process = False
             for row in csv_data:
@@ -167,6 +163,9 @@ def process_images_and_create_masks(dataset_path, csv_file):
                         need_process = True
 
             if need_process:
+                IMAGE_PATH = os.path.join(image_folder_path, image_file)
+                image_bgr = cv2.imread(IMAGE_PATH)
+                image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
                 mask_predictor.set_image(image_rgb)
                 for row in info:
                     if (row[6]==''):

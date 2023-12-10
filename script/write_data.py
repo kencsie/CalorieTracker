@@ -1,10 +1,9 @@
 import os
-from time import sleep
 import re
 import csv
 from shutil import move
 from subprocess import call
-import tempfile
+from tempfile import NamedTemporaryFile
 from collections import deque
 
 # Global Constants
@@ -25,7 +24,7 @@ FOOD_ID_DICT = {
 }
 
 
-def load_user_name_format(user_number):
+def load_user_name_format(user_number) -> dict:
     user_dict = {
             '1': {'name': 'Ken', 're_exp': r'IMG_(?P<date>\d{8})_(?P<time>\d{6})'},
             '2': {'name': 'Kenrick', 're_exp': r'(?<!IMG_)(?P<date>\d{8})_(?P<time>\d{6})'},
@@ -33,7 +32,7 @@ def load_user_name_format(user_number):
     return user_dict[user_number]
 
 
-def create_unfinished_date_list(csv_file_path, user_profile):
+def create_unfinished_date_list(csv_file_path, user_profile) -> list:
     unfin_dates_set = set()
     with open(csv_file_path, 'r') as csvfile:
         # Convert CSV to dict
@@ -50,12 +49,11 @@ def create_unfinished_date_list(csv_file_path, user_profile):
         # 'mass'      : ''
         # }
         reader = csv.DictReader(csvfile)
-
         for row in reader:
             image_name = row['image_name']
             match = re.search(user_profile['re_exp'], image_name)
 
-            # image_name match & mass field is empty
+            # Image_name match & mass field is empty
             if match and not row['mass']:
                 date = match.group('date')
                 # time = match.group('time')
@@ -68,15 +66,14 @@ def create_unfinished_date_list(csv_file_path, user_profile):
     return sorted(unfin_dates_set)
 
 
-def prompt_iterations():
+def prompt_iterations() -> int:
     # Prompt the user for the number of iterations for that day
     iterations = int(input("Enter the number of iterations for that day: "))
     return iterations
 
 
-def prompt_range():
-    start, end = input("Enter the start and end time of day range \
-separated by spaces (eg: 115433 123355): ").split()
+def prompt_interval() -> tuple:
+    start, end = input("Enter the start and end time of day range separated by spaces (eg: 115433 123355): ").split()
     return (start, end)
 
 
@@ -84,13 +81,13 @@ def clear_screen():
     _ = call('clear' if os.name == 'posix' else 'cls')
 
 
-def prompt_mass(id_set):
-    #clear_screen()
+def prompt_mass(id_list) -> dict:
+    # clear_screen()
 
     # Show the food items present in the image
     print("The food items present in the image are as follows:")
     print("--------------------")
-    for index, food_id in enumerate(id_set):
+    for index, food_id in enumerate(id_list):
         print(f"{index + 1}) {FOOD_ID_DICT[food_id[:-2]]}")
 
     # Obtain masses as list
@@ -100,7 +97,7 @@ def prompt_mass(id_set):
 
     # Create and populate dictionary object
     mass_dict = dict()
-    for food_id, mass in zip(id_set, mass_list):
+    for food_id, mass in zip(id_list, mass_list):
         mass_dict.update({food_id: mass})
 
     # TODO: Add confirmation screen after adding masses
@@ -111,18 +108,16 @@ def prompt_mass(id_set):
 def process_date_with_image(csv_file_path, date, user_profile):
     # Process a date that has an associated image
     iterations = prompt_iterations()
+
+    row_list = list()  # Store rows to be written to csv
     for _ in range(iterations):
-        # Here you would implement the logic for obtaining a range and mass values
-        # and then appending new lines with this mass information to the CSV
-        print(f"Processing iteration for date {date}...")  # Placeholder for actual processing
+        print(f"Processing iteration for date {date}...")
 
-        # Obtain range for time of day (per iteration)
-        (start, end) = prompt_range()
-
-        id_set = set()     # Store food IDs
-        row_list = list()  # Store data rows to be written to csv
+        # Obtain time period (per iteration)
+        (start, end) = prompt_interval()
 
         # Obtain food IDs within the given range
+        id_set = set()
         with open(csv_file_path, 'r') as csvfile:
             reader = csv.DictReader(csvfile)
 
@@ -162,7 +157,7 @@ def process_date_with_image(csv_file_path, date, user_profile):
     return row_list
 
 
-def comp_dict(a: dict, b: dict):
+def comp_row(a: dict, b: dict) -> bool:
     return a['image_name'] == b['image_name'] and a['object_id'] == b['object_id']
 
 
@@ -170,28 +165,24 @@ def write_to_csv(csv_file_path, data_list):
     # Convert data_list to queue
     data_queue = deque(data_list)
 
-    fieldnames = [item for item in data_list[0].keys()]
-
     # Write data to a CSV file using temporary file
-    fd, temp_path = tempfile.mkstemp()
-    with open(csv_file_path, mode='r', newline='') as csvfile, open(temp_path, mode='w', newline='') as temp:
-        reader = csv.DictReader(csvfile, fieldnames=fieldnames)
-        writer = csv.DictWriter(temp, fieldnames=fieldnames)
+    ntf = NamedTemporaryFile(mode='w', delete=False)
+    with open(csv_file_path, mode='r') as csvfile, ntf:
+        reader = csv.DictReader(csvfile)
+        writer = csv.DictWriter(ntf, fieldnames=reader.fieldnames)
         writer.writeheader()
 
-        # Access every row in csv and check for match with unique attributes (name and object_id)
+        # Access every row in csv and compare using unique attributes (name and object_id)
         for row in reader:
             line = row
-            if data_queue:                         # Queue not empty
-                if comp_dict(row, data_queue[0]):  # Rows match
-                    line = data_queue[0]           # Change the line to be written
-                    data_queue.popleft()           # Dequeue front
-
-            writer.writerow(line)                  # Write the appropriate line
+            if data_queue:
+                if comp_row(row, data_queue[0]):  # Rows match
+                    line = data_queue[0]          # Change the line to be written
+                    data_queue.popleft()          # Dequeue front
+            writer.writerow(line)
 
     # Overwrite the original csv file with the temp file
-    move(temp_path, csv_file_path)
-    os.close(fd)
+    move(ntf.name, csv_file_path)
 
 
 def debug_func(csv_file_path, user_profile):
@@ -201,21 +192,24 @@ def debug_func(csv_file_path, user_profile):
 
 def main():
     csv_file_path = os.path.join(os.path.dirname(os.getcwd()), 'Generated_Files', 'output.csv')
-    user_number = input("Enter User Number: \nKen:1, Kenrick:2\n")
+    user_number = input("Enter User Number (Ken [1], Kenrick [2]): ")
     user_profile = load_user_name_format(user_number)
     unfin_dates = create_unfinished_date_list(csv_file_path, user_profile)
-    print(unfin_dates)
+    print(f"Remaining Dates: {unfin_dates}")
 
     # Process unfinished dates
     data_list = list()
     for date in unfin_dates:
-        print(f'date:{date}')
+        # print(f'date:{date}')
         row_data = process_date_with_image(csv_file_path, date, user_profile)
         #print(f'row_data:{row_data}\n\n\n')
         data_list.extend(row_data)
 
     # Write data to CSV
-    print(f'data_list:{data_list}')
+    # print(f'data_list:{data_list}')
+    clear_screen()
+    date_range = date if len(unfin_dates) == 1 else f"{unfin_dates[0]} ~ {unfin_dates[-1]}" 
+    print(f"Updates from {date_range} Complete!")
     write_to_csv(csv_file_path, data_list)
 
 

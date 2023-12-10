@@ -95,8 +95,6 @@ def sort_csv_data(csv_file):
         writer.writerow(header)
         writer.writerows(sorted_data)
 
-
-dataset_path = os.path.join(HOME, "Food-7")
 output_csv = os.path.join(HOME, "output.csv")
 data_to_write = process_dataset(dataset_path, output_csv)
 
@@ -225,10 +223,7 @@ def process_images_and_create_masks(dataset_path, csv_file):
         writer.writerows(rows_temp)
     sort_csv_data(csv_file)
 
-dataset_path = os.path.join(HOME, "Food-7")
-csv_file = os.path.join(HOME, "output.csv")
-
-process_images_and_create_masks(dataset_path, csv_file)
+process_images_and_create_masks(dataset_path, output_csv)
 
 # sam.to('cpu')
 # del sam

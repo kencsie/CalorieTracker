@@ -16,7 +16,7 @@ import torch
 import cv2
 
 HOME = os.getcwd()
-print("HOME:", HOME)
+# print("HOME:", HOME)
 
 """**Download dataset from Roboflow**"""
 
@@ -114,8 +114,8 @@ weight_path = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
 if not os.path.exists(weight_path):
     subprocess.run(["wget", "-q", "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth", "-P", f"{HOME}/weights"])
 
-CHECKPOINT_PATH = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
-print(CHECKPOINT_PATH, "; exist:", os.path.isfile(CHECKPOINT_PATH))
+# CHECKPOINT_PATH = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
+# print(CHECKPOINT_PATH, "; exist:", os.path.isfile(CHECKPOINT_PATH))
 
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 MODEL_TYPE = "vit_h"
@@ -124,7 +124,7 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 
 sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
 
-print(sam.device)
+# print(sam.device)
 
 mask_predictor = SamPredictor(sam)
 

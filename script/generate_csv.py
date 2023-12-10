@@ -8,8 +8,13 @@ Original file is located at
 """
 
 import subprocess
-
+import numpy as np
+import supervision as sv
+import csv
 import os
+import torch
+import cv2
+
 HOME = os.getcwd()
 print("HOME:", HOME)
 
@@ -25,9 +30,6 @@ if not os.path.exists(dataset_path):
     dataset = project.version(7).download("yolov5")
 
 """**Write on CSV file with the annotation files**"""
-
-import os
-import csv
 
 def process_label_file(file_path):
     objects = []
@@ -115,8 +117,6 @@ if not os.path.exists(weight_path):
 CHECKPOINT_PATH = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
 print(CHECKPOINT_PATH, "; exist:", os.path.isfile(CHECKPOINT_PATH))
 
-import torch
-
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 MODEL_TYPE = "vit_h"
 
@@ -129,14 +129,6 @@ print(sam.device)
 mask_predictor = SamPredictor(sam)
 
 """**Calculate areas and rewrite on CSV file**"""
-
-import cv2
-import numpy as np
-import supervision as sv
-import csv
-import os
-import supervision as v
-import gc
 
 #     # Replace the original file with the updated temp file
 #     os.remove(csv_file)

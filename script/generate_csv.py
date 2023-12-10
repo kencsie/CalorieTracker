@@ -9,7 +9,6 @@ Original file is located at
 
 import subprocess
 import numpy as np
-import supervision as sv
 import csv
 import os
 import torch
@@ -130,6 +129,8 @@ mask_predictor = SamPredictor(sam)
 #     # Replace the original file with the updated temp file
 #     os.remove(csv_file)
 #     os.rename(temp_file, csv_file)
+
+import supervision as sv
 
 def process_images_and_create_masks(dataset_path, csv_file):
     with open(csv_file, 'r') as csvfile:

@@ -110,11 +110,10 @@ subprocess.run(["pip", "install", "-q", "git+https://github.com/facebookresearch
 subprocess.run(["pip", "install", "-q", "jupyter_bbox_widget", "dataclasses-json", "supervision"])
 
 subprocess.run(["mkdir", "-p", f"{HOME}/weights"])
-weight_path = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
-if not os.path.exists(weight_path):
+CHECKPOINT_PATH = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
+if not os.path.exists(CHECKPOINT_PATH):
     subprocess.run(["wget", "-q", "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth", "-P", f"{HOME}/weights"])
 
-# CHECKPOINT_PATH = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
 # print(CHECKPOINT_PATH, "; exist:", os.path.isfile(CHECKPOINT_PATH))
 
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')

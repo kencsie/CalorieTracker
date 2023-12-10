@@ -3,7 +3,7 @@ import re
 import csv
 import shutil
 from subprocess import call
-from tempfile import NamedTemporaryFile
+import tempfile
 
 # Global Constants
 FOOD_ID_DICT = {
@@ -111,10 +111,10 @@ def process_date_with_image(csv_file_path, date, user_profile):
     iterations = prompt_iterations()
     row_list = list()  # Store data rows to be written to csv
     
-    for _ in range(iterations):
+    for iter_num in range(iterations):
         # Here you would implement the logic for obtaining a range and mass values
         # and then appending new lines with this mass information to the CSV
-        print(f"Processing iteration for date {date}...")  # Placeholder for actual processing
+        print(f"Processing iteration {iter_num} for date {date}...")  # Placeholder for actual processing
 
         # Obtain range for time of day (per iteration)
         (start, end) = prompt_range()
@@ -163,10 +163,6 @@ def process_date_with_image(csv_file_path, date, user_profile):
     return row_list
 
 
-import csv
-import os
-import tempfile
-
 def write_to_csv(csv_file_path, data_list):
     # Convert data_list to a dictionary using a composite key
     data_dict = {(row['image_name'], row['object_id']): row for row in data_list}
@@ -210,12 +206,12 @@ def main():
     user_number = input("Enter User Number: \nKen:1, Kenrick:2\n")
     user_profile = load_user_name_format(user_number)
     unfin_dates = create_unfinished_date_list(csv_file_path, user_profile)
-    print(unfin_dates)
+    print(f'This is {user_profile["name"]}\'s unfinished date list:{unfin_dates}')
 
     # Process unfinished dates
     data_list = list()
     for date in unfin_dates:
-        print(f'date:{date}')
+        print(f'Date:{date}')
         row_data = process_date_with_image(csv_file_path, date, user_profile)
         #print(f'row_data:{row_data}\n\n\n')
         data_list.extend(row_data)

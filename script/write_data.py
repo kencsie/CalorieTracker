@@ -73,7 +73,8 @@ def prompt_iterations() -> int:
 
 
 def prompt_interval() -> tuple:
-    start, end = input("Enter the start and end time of day range separated by spaces (eg: 115433 123355): ").split()
+    print("Enter the start and end time of day range separated by spaces (eg: 115433 123355): ")
+    start, end = input().split()
     return (start, end)
 
 
@@ -105,7 +106,7 @@ def prompt_mass(id_list) -> dict:
     return mass_dict
 
 
-def process_date_with_image(csv_file_path, date, user_profile):
+def process_date_with_image(csv_file_path, date, user_profile) -> list:
     # Process a date that has an associated image
     iterations = prompt_iterations()
 
@@ -153,7 +154,6 @@ def process_date_with_image(csv_file_path, date, user_profile):
                         row['mass'] = mass_dict.get(row['object_id'])
                         row_list.append(row)  # Only write the modified rows
                         #print(f'row:{row}\n\n')
-
     return row_list
 
 

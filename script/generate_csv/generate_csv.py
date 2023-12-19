@@ -22,20 +22,21 @@ import csv
 import os
 import torch
 import cv2
+import supervision as sv
 
 HOME = os.getcwd()
 # print("HOME:", HOME)
 
 """**Download dataset from Roboflow**"""
 
-dataset_path = os.path.join(HOME, "Food-7")
+dataset_path = os.path.join(HOME, "Food-10")
 if not os.path.exists(dataset_path):
     subprocess.run(["pip", "install", "roboflow"])
 
     from roboflow import Roboflow
     rf = Roboflow(api_key="lttzJNap0h9lODifvr4O")
     project = rf.workspace("school-yrws4").project("food-pion4")
-    dataset = project.version(7).download("yolov5")
+    dataset = project.version(10).download("yolov5")
 
 """**Write on CSV file with the annotation files**"""
 
@@ -44,10 +45,41 @@ def process_label_file(file_path):
     with open(file_path, 'r') as file:
         for line in file:
             parts = line.strip().split()
-            if len(parts) == 5:  # Ensure there are 5 elements in the line
-                object_id, x_center, y_center, width, height = map(float, parts)
+            parts_float = [float(coord) for coord in parts[1:]]
+            num_vertices = len(parts_float) // 2
+            assert len(parts_float) % 2 == 0, "The number of coordinates should be even."
+            
+            polygon = np.array(parts_float).reshape(num_vertices, 2)   
+            bounding_box = sv.polygon_to_xyxy(polygon)
+            #print(bounding_box)
+
+            if len(bounding_box) == 4:  # Ensure there are 4 elements for bounding box
+                object_id, x_center, y_center, width, height = map(float, np.concatenate([[float(parts[0])], bounding_box]))
                 objects.append([object_id, x_center, y_center, width, height, '', '', ''])  # Leaving area and mass empty
     return objects
+
+def process_image_mass(file_path):
+    image_mass_list = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            parts = line.strip().split()
+
+            if not parts:
+                continue
+
+            parts_float = [float(coord) for coord in parts[1:]]
+            num_vertices = len(parts_float) // 2
+            assert len(parts_float) % 2 == 0, "The number of coordinates should be even."
+            
+            polygon = np.array(parts_float).reshape(num_vertices, 2)   
+            #Convert from polygon to mask
+            mask = sv.polygon_to_mask((polygon*640).astype(int), (640,640))
+            #Count nonzero pixels
+            image_area = np.count_nonzero(mask)
+            image_mass_list.append(image_area)
+            
+    return image_mass_list
+
 
 def get_processed_images(csv_file):
     processed_images = set()
@@ -78,7 +110,12 @@ def process_dataset(dataset_path, output_csv):
                 adjusted_image_name = adjust_image_name(image_name)
                 if adjusted_image_name not in processed_images:
                     objects = process_label_file(os.path.join(label_path, label_file))
-                    for obj in objects:
+                    image_areas = process_image_mass(os.path.join(label_path, label_file))
+                    #print(objects)
+                    #print(image_areas)
+                    for obj, image_area in zip(objects, image_areas):
+                        #Replace image_area in obj with number
+                        obj[5] = image_area
                         data_to_write.append([adjusted_image_name] + obj)
 
     return data_to_write
@@ -111,7 +148,7 @@ sort_csv_data(output_csv)
 
 """**Load SAM**"""
 
-subprocess.run(["pip", "install", "-q", "git+https://github.com/facebookresearch/segment-anything.git"])
+'''subprocess.run(["pip", "install", "-q", "git+https://github.com/facebookresearch/segment-anything.git"])
 
 subprocess.run(["pip", "install", "-q", "jupyter_bbox_widget", "dataclasses-json", "supervision"])
 
@@ -242,4 +279,4 @@ process_images_and_create_masks(dataset_path, output_csv)
 # sam.to('cpu')
 # del sam
 # del mask_predictor
-torch.cuda.empty_cache()
+torch.cuda.empty_cache()'''

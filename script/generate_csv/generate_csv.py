@@ -29,14 +29,14 @@ HOME = os.getcwd()
 
 """**Download dataset from Roboflow**"""
 
-dataset_path = os.path.join(HOME, "Food-10")
+dataset_path = os.path.join(HOME, "Food-11")
 if not os.path.exists(dataset_path):
     subprocess.run(["pip", "install", "roboflow"])
 
     from roboflow import Roboflow
     rf = Roboflow(api_key="lttzJNap0h9lODifvr4O")
     project = rf.workspace("school-yrws4").project("food-pion4")
-    dataset = project.version(10).download("yolov5")
+    dataset = project.version(11).download("yolov5")
 
 """**Write on CSV file with the annotation files**"""
 
@@ -79,7 +79,6 @@ def process_image_mass(file_path):
             image_mass_list.append(image_area)
             
     return image_mass_list
-
 
 def get_processed_images(csv_file):
     processed_images = set()
@@ -146,29 +145,6 @@ data_to_write = process_dataset(dataset_path, output_csv)
 write_to_csv(data_to_write, output_csv)
 sort_csv_data(output_csv)
 
-"""**Load SAM**"""
-
-'''subprocess.run(["pip", "install", "-q", "git+https://github.com/facebookresearch/segment-anything.git"])
-
-subprocess.run(["pip", "install", "-q", "jupyter_bbox_widget", "dataclasses-json", "supervision"])
-
-subprocess.run(["mkdir", "-p", f"{HOME}/weights"])
-CHECKPOINT_PATH = os.path.join(HOME, "weights", "sam_vit_h_4b8939.pth")
-if not os.path.exists(CHECKPOINT_PATH):
-    subprocess.run(["wget", "-q", "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth", "-P", f"{HOME}/weights"])
-
-# print(CHECKPOINT_PATH, "; exist:", os.path.isfile(CHECKPOINT_PATH))
-
-DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-MODEL_TYPE = "vit_h"
-
-from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
-
-sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
-
-# print(sam.device)
-
-mask_predictor = SamPredictor(sam)
 
 """**Calculate areas and rewrite on CSV file**"""
 
@@ -200,67 +176,16 @@ def process_images_and_create_masks(dataset_path, csv_file):
                         need_process = True
 
             if need_process:
-                IMAGE_PATH = os.path.join(image_folder_path, image_file)
-                image_bgr = cv2.imread(IMAGE_PATH)
-                image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
-                mask_predictor.set_image(image_rgb)
-                for row in info:
-                    if (row[6]==''):
-                        x_center, y_center, width, height = map(float, row[2:6])
-                        id = row[1]
-                        x_min = (x_center * 640) - (width *640) / 2
-                        y_min = (y_center * 640) - (height *640) / 2
-                        x_max = (x_center * 640) + (width *640) / 2
-                        y_max = (y_center * 640) + (height *640) / 2
-
-                        bbox = np.array([x_min, y_min, x_max, y_max])
-
-                        masks, scores, logits = mask_predictor.predict(
-                            box=bbox,
-                            multimask_output= True
-                        )
-                        image_area = np.count_nonzero(masks[2])
-
-                        # visualize the mask with sv
-                        # sv.plot_images_grid(
-                        #     images=masks,
-                        #     grid_size=(1, 4),
-                        #     size=(16, 4)
-                        # )
-
-                        # box_annotator = sv.BoxAnnotator(color=sv.Color.red())
-                        # mask_annotator = sv.MaskAnnotator(color=sv.Color.red(), color_lookup=sv.ColorLookup.INDEX)
-
-                        # detections = sv.Detections(
-                        #     xyxy=sv.mask_to_xyxy(masks=masks),
-                        #     mask=masks
-                        # )
-                        # detections = detections[detections.area == np.max(detections.area)]
-
-                        # source_image = box_annotator.annotate(scene=image_bgr.copy(), detections=detections, skip_label=True)
-                        # segmented_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
-
-                        # sv.plot_images_grid(
-                        #     images=[source_image, segmented_image],
-                        #     grid_size=(1, 2),
-                        #     titles=['source image', 'segmented image']
-                        # )
-
-                        # print(f"{adjusted_image_name} {id} {image_area}")
-                        row[6] = image_area
-
-                # Reset image
-                mask_predictor.reset_image()
-                torch.cuda.empty_cache()
+                raise Exception("The image_area should already be calculated.")
 
             coin_image = 0
             coin_area = (13**2) * np.pi  # coin area in mm^2
             for obj in info:
-                if float(obj[1]) == 2.0:
+                if float(obj[1]) == 7.0:
                     coin_image = float(obj[6])
 
             for obj in info:
-                if float(obj[1]) != 2.0:
+                if float(obj[1]) != 7.0:
                     if obj[7] == '' and coin_image != 0:
                         S = float(obj[6]) / float(coin_image) * coin_area
                         obj[7] = S
@@ -276,6 +201,7 @@ def process_images_and_create_masks(dataset_path, csv_file):
 
 process_images_and_create_masks(dataset_path, output_csv)
 
+'''
 # sam.to('cpu')
 # del sam
 # del mask_predictor

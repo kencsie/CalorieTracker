@@ -29,14 +29,14 @@ HOME = os.getcwd()
 
 """**Download dataset from Roboflow**"""
 
-dataset_path = os.path.join(HOME, "Food-11")
+dataset_path = os.path.join(HOME, "Food-14")
 if not os.path.exists(dataset_path):
     subprocess.run(["pip", "install", "roboflow"])
 
     from roboflow import Roboflow
     rf = Roboflow(api_key="lttzJNap0h9lODifvr4O")
     project = rf.workspace("school-yrws4").project("food-pion4")
-    dataset = project.version(11).download("yolov5")
+    dataset = project.version(14).download("yolov5")
 
 """**Write on CSV file with the annotation files**"""
 

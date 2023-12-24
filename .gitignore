@@ -1,4 +1,11 @@
+#Personal Matters
 push.sh
 pull.sh
 comment.txt
-*/.ipynb_checkpoints
+
+#Ignore Dataset and model files
+**/Food-[0-9]/
+**/Food-[0-9][0-9]/
+**/Food-[0-9][0-9][0-9]/
+**/weights/
+**/yolov5

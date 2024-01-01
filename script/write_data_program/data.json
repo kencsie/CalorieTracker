@@ -44,5 +44,28 @@
                 "cucumber": 41
             }
         ]
+    },
+    "20231129": {
+        "iteratiion": 2,
+        "range": [
+            "123656 124631",
+            "130140 130941"
+        ],
+        "food_mass": [
+            {
+                "Kabayaki sea bream fillet": 45,
+                "pig blood curd": 44,
+                "soy egg": 53,
+                "cabbage": 50,
+                "coin": 81
+            },
+            {
+                "Kabayaki sea bream fillet": 21,
+                "pig blood curd": 28,
+                "soy egg": 31,
+                "cabbage": 26,
+                "coin": 54
+            }
+        ]
     }
 }

@@ -25,18 +25,19 @@ import cv2
 import supervision as sv
 
 HOME = os.getcwd()
+VERSION = 17
 # print("HOME:", HOME)
 
 """**Download dataset from Roboflow**"""
 
-dataset_path = os.path.join(HOME, "Food-16")
+dataset_path = os.path.join(HOME, f"Food-{VERSION}")
 if not os.path.exists(dataset_path):
     subprocess.run(["pip", "install", "roboflow"])
 
     from roboflow import Roboflow
     rf = Roboflow(api_key="lttzJNap0h9lODifvr4O")
     project = rf.workspace("school-yrws4").project("food-pion4")
-    dataset = project.version(16).download("yolov5")
+    dataset = project.version(VERSION).download("yolov5")
 
 """**Write on CSV file with the annotation files**"""
 

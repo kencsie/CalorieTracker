@@ -1,6 +1,7 @@
 import os
 import re
 import csv
+import json
 from shutil import move
 from subprocess import call
 from tempfile import NamedTemporaryFile
@@ -11,45 +12,27 @@ FOOD_ID_DICT = {
     "0": "Kabayaki sea bream fillet",
     "1": "Spam",
     "2": "apple -sliced-",
-    "3": "bean sprouts",
-    "4": "braised pork",
-    "5": "cabbage",
-    "6": "cauliflower",
-    "7": "cherry tomato",
-    "8": "coin",
-    "9": "creamy tofu",
-    "10": "creamy tofu -without sauce-",
-    "11": "cucumber",
-    "12": "dragon fruit",
-    "13": "egg tofu",
-    "14": "eggplant",
-    "15": "firm tofu",
-    "16": "fish cake",
-    "17": "fried chicken cutlet",
-    "18": "fried potato",
-    "19": "fried tofu",
-    "20": "green bean",
-    "21": "guava -sliced-",
-    "22": "mushroom",
-    "23": "mustard greens",
-    "24": "omelette",
-    "25": "onion",
-    "26": "pig blood curd",
-    "27": "pig liver",
-    "28": "pineapple",
-    "29": "pumpkin",
-    "30": "red braised pork",
-    "31": "soy egg",
-    "32": "sponge gourd",
-    "33": "steamed egg",
-    "34": "stir fried eggplant",
-    "35": "sweet and sour pork",
-    "36": "sweet potato",
-    "37": "sweet potato leaves",
-    "38": "tangerine",
-    "39": "wax apple"
+    "3": "cabbage",
+    "4": "coin",
+    "5": "creamy tofu",
+    "6": "creamy tofu -without sauce-",
+    "7": "cucumber",
+    "8": "egg tofu",
+    "9": "firm tofu",
+    "10": "fish cake",
+    "11": "fried chicken cutlet",
+    "12": "fried potato",
+    "13": "grilled pork",
+    "14": "guava -sliced-",
+    "15": "mustard greens",
+    "16": "pig blood curd",
+    "17": "pig liver",
+    "18": "pineapple",
+    "19": "pumpkin",
+    "20": "red grilled pork",
+    "21": "soy egg",
+    "22": "sweet potato leaves"
 }
-
 
 def load_user_name_format(user_number) -> dict:
     user_dict = {
@@ -133,7 +116,22 @@ def prompt_mass(id_list) -> dict:
     return mass_dict
 
 
-def process_date_with_image(csv_file_path, date, user_profile) -> list:
+def process_date_with_image(csv_file_path, date, user_profile) -> tuple:
+    def convert_food_mass_list(original_dict) -> dict:
+        transformed_dict = {}
+        # Iterate through each item in the original dictionary
+        for key, value in original_dict.items():
+            convert_key = key[:-2] #index ex. 16.0 -> 16
+            food_name = FOOD_ID_DICT.get(convert_key)
+            if food_name:
+                transformed_dict[food_name] = value
+        return transformed_dict
+
+    # Prepare user input for json file(automation)
+    user_input_data = {}
+    user_range_list = []
+    user_food_mass_list = []
+
     # Process a date that has an associated image
     iterations = prompt_iterations()
 
@@ -181,7 +179,13 @@ def process_date_with_image(csv_file_path, date, user_profile) -> list:
                         row['mass'] = mass_dict.get(row['object_id'])
                         row_list.append(row)  # Only write the modified rows
                         #print(f'row:{row}\n\n')
-    return row_list
+    
+        # Update user input list
+        user_range_list.append(start+" "+end)
+        user_food_mass_list.append(convert_food_mass_list(mass_dict))
+
+    user_input_data[date] = {'iteratiion':iterations, 'range':user_range_list, 'food_mass':user_food_mass_list}
+    return (row_list, user_input_data)
 
 
 def comp_row(a: dict, b: dict) -> bool:
@@ -211,6 +215,22 @@ def write_to_csv(csv_file_path, data_list):
     # Overwrite the original csv file with the temp file
     move(ntf.name, csv_file_path)
 
+def write_to_json(json_file_path, user_history_list):
+    # Check if the file exists and has content
+    if os.path.exists(json_file_path) and os.path.getsize(json_file_path) > 0:
+        # Read existing data from the file
+        with open(json_file_path, 'r') as file:
+            data = json.load(file)
+    else:
+        # If the file does not exist or is empty, start with an empty dictionary
+        data = {}
+
+    for date, contents in user_history_list.items():
+        data[date] = contents
+
+    # Write updated data back to the file
+    with open(json_file_path, 'w') as file:
+        json.dump(data, file, indent=4)
 
 def debug_func(csv_file_path, user_profile):
     print(f'CSV_file_path:{csv_file_path}')
@@ -228,9 +248,10 @@ def main():
     data_list = list()
     for date in unfin_dates[2:3]:
         print(f'date:{date}')
-        row_data = process_date_with_image(csv_file_path, date, user_profile)
+        row_data, user_input_history = process_date_with_image(csv_file_path, date, user_profile)
         #print(f'row_data:{row_data}\n\n\n')
         data_list.extend(row_data)
+        write_to_json('./data.json', user_input_history)
 
     # Write data to CSV
     # print(f'data_list:{data_list}')

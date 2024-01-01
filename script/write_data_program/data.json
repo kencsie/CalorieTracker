@@ -1,0 +1,48 @@
+{
+    "20231127": {
+        "iteratiion": 2,
+        "range": [
+            "124119 125309",
+            "130744 132152"
+        ],
+        "food_mass": [
+            {
+                "pig blood curd": 24,
+                "pumpkin": 51,
+                "red grilled pork": 34,
+                "cabbage": 69,
+                "coin": 76
+            },
+            {
+                "pig blood curd": 12,
+                "pumpkin": 15,
+                "red grilled pork": 22,
+                "cabbage": 40,
+                "coin": 37
+            }
+        ]
+    },
+    "20231128": {
+        "iteratiion": 2,
+        "range": [
+            "125116 130822",
+            "132845 134439"
+        ],
+        "food_mass": [
+            {
+                "Kabayaki sea bream fillet": 54,
+                "cabbage": 78,
+                "coin": 34,
+                "creamy tofu -without sauce-": 23,
+                "cucumber": 86
+            },
+            {
+                "Kabayaki sea bream fillet": 31,
+                "cabbage": 36,
+                "coin": 19,
+                "creamy tofu -without sauce-": 7,
+                "cucumber": 41
+            }
+        ]
+    }
+}

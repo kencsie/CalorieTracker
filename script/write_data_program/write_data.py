@@ -215,7 +215,7 @@ def write_to_csv(csv_file_path, data_list):
     # Overwrite the original csv file with the temp file
     move(ntf.name, csv_file_path)
 
-def write_to_json(json_file_path, user_history_list):
+def write_to_json(json_file_path, user_history_list, user_name):
     # Check if the file exists and has content
     if os.path.exists(json_file_path) and os.path.getsize(json_file_path) > 0:
         # Read existing data from the file
@@ -225,8 +225,11 @@ def write_to_json(json_file_path, user_history_list):
         # If the file does not exist or is empty, start with an empty dictionary
         data = {}
 
+    if user_name not in data:
+        data[user_name] = {}
+
     for date, contents in user_history_list.items():
-        data[date] = contents
+        data[user_name][date] = contents
 
     # Write updated data back to the file
     with open(json_file_path, 'w') as file:
@@ -246,12 +249,12 @@ def main():
 
     # Process unfinished dates
     data_list = list()
-    for date in unfin_dates[2:3]:
+    for date in unfin_dates[:1]:
         print(f'date:{date}')
         row_data, user_input_history = process_date_with_image(csv_file_path, date, user_profile)
         #print(f'row_data:{row_data}\n\n\n')
         data_list.extend(row_data)
-        write_to_json('./data.json', user_input_history)
+        write_to_json('./data.json', user_input_history, user_profile['name'])
 
     # Write data to CSV
     # print(f'data_list:{data_list}')

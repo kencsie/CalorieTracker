@@ -182,11 +182,11 @@ def process_images_and_create_masks(dataset_path, csv_file):
             coin_image = 0
             coin_area = (13**2) * np.pi  # coin area in mm^2
             for obj in info:
-                if float(obj[1]) == 8.0:
+                if float(obj[1]) == 4.0:
                     coin_image = float(obj[6])
 
             for obj in info:
-                if float(obj[1]) != 8.0:
+                if float(obj[1]) != 4.0:
                     if obj[7] == '' and coin_image != 0:
                         S = float(obj[6]) / float(coin_image) * coin_area
                         obj[7] = S

@@ -245,6 +245,115 @@
                     "creamy tofu": 38
                 }
             ]
+        },
+        "20231214": {
+            "iteratiion": 3,
+            "range": [
+                "124834 125725",
+                "130409 130836",
+                "131300 131647"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 62,
+                    "pumpkin": 45,
+                    "cabbage": 73,
+                    "cucumber": 42
+                },
+                {
+                    "Kabayaki sea bream fillet": 35,
+                    "pumpkin": 31,
+                    "cabbage": 44,
+                    "cucumber": 27
+                },
+                {
+                    "Kabayaki sea bream fillet": 15,
+                    "pumpkin": 20,
+                    "cabbage": 23,
+                    "cucumber": 14
+                }
+            ]
+        },
+        "20231215": {
+            "iteratiion": 3,
+            "range": [
+                "123125 123807",
+                "124347 124804",
+                "125445 125839"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 54,
+                    "cabbage": 92,
+                    "creamy tofu": 64,
+                    "cucumber": 30
+                },
+                {
+                    "Kabayaki sea bream fillet": 26,
+                    "cabbage": 51,
+                    "creamy tofu": 29,
+                    "cucumber": 20
+                },
+                {
+                    "Kabayaki sea bream fillet": 12,
+                    "cabbage": 22,
+                    "creamy tofu": 30,
+                    "cucumber": 10
+                }
+            ]
+        },
+        "20231219": {
+            "iteratiion": 3,
+            "range": [
+                "124118 124646",
+                "125214 125438",
+                "125739 130044"
+            ],
+            "food_mass": [
+                {
+                    "cabbage": 84,
+                    "cucumber": 56
+                },
+                {
+                    "cabbage": 61,
+                    "cucumber": 31
+                },
+                {
+                    "cabbage": 37,
+                    "cucumber": 46
+                }
+            ]
+        },
+        "20231220": {
+            "iteratiion": 3,
+            "range": [
+                "180014 180731",
+                "181239 182208",
+                "182517 182921"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 58,
+                    "pig blood curd": 33,
+                    "cabbage": 92,
+                    "creamy tofu": 103,
+                    "egg tofu": 74
+                },
+                {
+                    "Kabayaki sea bream fillet": 35,
+                    "pig blood curd": 17,
+                    "cabbage": 56,
+                    "creamy tofu": 64,
+                    "egg tofu": 41
+                },
+                {
+                    "Kabayaki sea bream fillet": 15,
+                    "pig blood curd": 14,
+                    "cabbage": 40,
+                    "creamy tofu": 58,
+                    "egg tofu": 32
+                }
+            ]
         }
     }
 }

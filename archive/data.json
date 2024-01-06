@@ -1,0 +1,486 @@
+{
+    "Kenrick": {
+        "20231103": {
+            "iteratiion": 2,
+            "range": [
+                "122808 123610",
+                "124647 125116"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 50,
+                    "pumpkin": 46,
+                    "apple -sliced-": 55,
+                    "soy egg": 52,
+                    "cabbage": 64,
+                    "cucumber": 63
+                },
+                {
+                    "Kabayaki sea bream fillet": 27,
+                    "pumpkin": 27,
+                    "apple -sliced-": 25,
+                    "soy egg": 24,
+                    "cabbage": 40,
+                    "cucumber": 36
+                }
+            ]
+        },
+        "20231106": {
+            "iteratiion": 2,
+            "range": [
+                "114439 115816",
+                "120600 120926"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 58,
+                    "fried chicken cutlet": 999,
+                    "pineapple": 24,
+                    "pumpkin": 32,
+                    "cabbage": 81
+                },
+                {
+                    "Kabayaki sea bream fillet": 31,
+                    "pineapple": 24,
+                    "pumpkin": 15,
+                    "cabbage": 49
+                }
+            ]
+        },
+        "20231107": {
+            "iteratiion": 2,
+            "range": [
+                "115550 120047",
+                "121538 122219"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 62,
+                    "pig blood curd": 47,
+                    "cabbage": 67,
+                    "cucumber": 46
+                },
+                {
+                    "Kabayaki sea bream fillet": 36,
+                    "pig blood curd": 27,
+                    "cabbage": 41,
+                    "cucumber": 27
+                }
+            ]
+        },
+        "20231108": {
+            "iteratiion": 1,
+            "range": [
+                "123952 124717"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 54,
+                    "pineapple": 25,
+                    "cabbage": 85,
+                    "cucumber": 39
+                }
+            ]
+        },
+        "20231109": {
+            "iteratiion": 2,
+            "range": [
+                "122432 122904",
+                "124709 125159"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 35,
+                    "pumpkin": 33,
+                    "cabbage": 58,
+                    "cucumber": 50
+                },
+                {
+                    "Kabayaki sea bream fillet": 19,
+                    "pumpkin": 14,
+                    "cabbage": 25,
+                    "cucumber": 29
+                }
+            ]
+        },
+        "20231110": {
+            "iteratiion": 1,
+            "range": [
+                "133703 134518"
+            ],
+            "food_mass": [
+                {
+                    "fried potato": 36,
+                    "pig blood curd": 76,
+                    "red grilled pork": 64,
+                    "cabbage": 58
+                }
+            ]
+        },
+        "20231113": {
+            "iteratiion": 1,
+            "range": [
+                "124025 124639"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 55,
+                    "pumpkin": 42,
+                    "cabbage": 61,
+                    "cucumber": 21
+                }
+            ]
+        },
+        "20231114": {
+            "iteratiion": 2,
+            "range": [
+                "123331 124450",
+                "125917 130548"
+            ],
+            "food_mass": [
+                {
+                    "pig blood curd": 47,
+                    "cabbage": 88,
+                    "cucumber": 38
+                },
+                {
+                    "pig blood curd": 19,
+                    "cabbage": 54,
+                    "cucumber": 26
+                }
+            ]
+        },
+        "20231116": {
+            "iteratiion": 2,
+            "range": [
+                "175908 180610",
+                "182757 183419"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 57,
+                    "pineapple": 37,
+                    "cabbage": 74
+                },
+                {
+                    "Kabayaki sea bream fillet": 33,
+                    "pineapple": 22,
+                    "cabbage": 23
+                }
+            ]
+        },
+        "20231117": {
+            "iteratiion": 2,
+            "range": [
+                "122121 122525",
+                "131441 132219"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 60,
+                    "pig blood curd": 51,
+                    "cabbage": 65,
+                    "cucumber": 40
+                },
+                {
+                    "Kabayaki sea bream fillet": 30,
+                    "pig blood curd": 37,
+                    "cabbage": 29,
+                    "cucumber": 23
+                }
+            ]
+        },
+        "20231120": {
+            "iteratiion": 1,
+            "range": [
+                "182852 183808"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 25,
+                    "fried potato": 17,
+                    "cabbage": 46,
+                    "creamy tofu": 29,
+                    "creamy tofu -without sauce-": 33
+                }
+            ]
+        },
+        "20231121": {
+            "iteratiion": 1,
+            "range": [
+                "133245 134307"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 64,
+                    "pig blood curd": 47,
+                    "soy egg": 72,
+                    "cabbage": 75,
+                    "cucumber": 55
+                }
+            ]
+        }
+    },
+    "Ken": {
+        "20231122": {
+            "iteratiion": 2,
+            "range": [
+                "123052 125734",
+                "131217 132656"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 61,
+                    "soy egg": 54,
+                    "cabbage": 75,
+                    "creamy tofu -without sauce-": 56,
+                    "cucumber": 52
+                },
+                {
+                    "Kabayaki sea bream fillet": 32,
+                    "soy egg": 35,
+                    "cabbage": 41,
+                    "creamy tofu -without sauce-": 29,
+                    "cucumber": 22
+                }
+            ]
+        },
+        "20231124": {
+            "iteratiion": 2,
+            "range": [
+                "123256 130120",
+                "131431 133136"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 59,
+                    "Spam": 43,
+                    "pumpkin": 34,
+                    "cabbage": 81,
+                    "creamy tofu -without sauce-": 47
+                },
+                {
+                    "Kabayaki sea bream fillet": 23,
+                    "Spam": 24,
+                    "pumpkin": 11,
+                    "cabbage": 38,
+                    "creamy tofu -without sauce-": 25
+                }
+            ]
+        },
+        "20231127": {
+            "iteratiion": 2,
+            "range": [
+                "124119 125309",
+                "130744 132152"
+            ],
+            "food_mass": [
+                {
+                    "pig blood curd": 51,
+                    "pumpkin": 34,
+                    "red grilled pork": 69,
+                    "cabbage": 76
+                },
+                {
+                    "pig blood curd": 15,
+                    "pumpkin": 22,
+                    "red grilled pork": 40,
+                    "cabbage": 37
+                }
+            ]
+        },
+        "20231128": {
+            "iteratiion": 2,
+            "range": [
+                "125116 130822",
+                "132845 134439"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 54,
+                    "cabbage": 86,
+                    "creamy tofu -without sauce-": 78,
+                    "cucumber": 34
+                },
+                {
+                    "Kabayaki sea bream fillet": 31,
+                    "cabbage": 41,
+                    "creamy tofu -without sauce-": 36,
+                    "cucumber": 19
+                }
+            ]
+        },
+        "20231129": {
+            "iteratiion": 2,
+            "range": [
+                "123656 124631",
+                "130140 130941"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 45,
+                    "pig blood curd": 53,
+                    "soy egg": 50,
+                    "cabbage": 81,
+                    "cucumber": 44
+                },
+                {
+                    "Kabayaki sea bream fillet": 21,
+                    "pig blood curd": 31,
+                    "soy egg": 26,
+                    "cabbage": 54,
+                    "cucumber": 28
+                }
+            ]
+        },
+        "20231130": {
+            "iteratiion": 2,
+            "range": [
+                "123906 125438",
+                "131006 132133"
+            ],
+            "food_mass": [
+                {
+                    "pumpkin": 42,
+                    "cabbage": 79,
+                    "cucumber": 47
+                },
+                {
+                    "pumpkin": 12,
+                    "cabbage": 28,
+                    "cucumber": 32
+                }
+            ]
+        },
+        "20231201": {
+            "iteratiion": 2,
+            "range": [
+                "125634 131900",
+                "132728 134002"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 54,
+                    "fried potato": 40,
+                    "pig blood curd": 53,
+                    "cabbage": 73,
+                    "creamy tofu -without sauce-": 48
+                },
+                {
+                    "Kabayaki sea bream fillet": 53,
+                    "fried potato": 20,
+                    "pig blood curd": 29,
+                    "cabbage": 36,
+                    "creamy tofu -without sauce-": 22
+                }
+            ]
+        },
+        "20231206": {
+            "iteratiion": 2,
+            "range": [
+                "121624 124025",
+                "125721 131042"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 66,
+                    "pig blood curd": 64,
+                    "cabbage": 90,
+                    "cucumber": 61
+                },
+                {
+                    "Kabayaki sea bream fillet": 32,
+                    "pig blood curd": 38,
+                    "cabbage": 54,
+                    "cucumber": 31
+                }
+            ]
+        },
+        "20231207": {
+            "iteratiion": 2,
+            "range": [
+                "125545 131034",
+                "131411 132543"
+            ],
+            "food_mass": [
+                {
+                    "pumpkin": 41,
+                    "cabbage": 80,
+                    "creamy tofu -without sauce-": 48,
+                    "cucumber": 43
+                },
+                {
+                    "pumpkin": 23,
+                    "cabbage": 37,
+                    "creamy tofu -without sauce-": 26,
+                    "cucumber": 27
+                }
+            ]
+        },
+        "20231208": {
+            "iteratiion": 3,
+            "range": [
+                "122112 123315",
+                "125355 130333",
+                "130836 131608"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 51,
+                    "fried potato": 32,
+                    "cabbage": 58,
+                    "cucumber": 27,
+                    "egg tofu": 69
+                },
+                {
+                    "Kabayaki sea bream fillet": 23,
+                    "fried potato": 14,
+                    "cabbage": 35,
+                    "cucumber": 17,
+                    "egg tofu": 37
+                },
+                {
+                    "Kabayaki sea bream fillet": 8,
+                    "cabbage": 23,
+                    "cucumber": 9,
+                    "egg tofu": 14
+                }
+            ]
+        },
+        "20231211": {
+            "iteratiion": 1,
+            "range": [
+                "130831 132343"
+            ],
+            "food_mass": [
+                {
+                    "Kabayaki sea bream fillet": 54,
+                    "pig blood curd": 41,
+                    "pumpkin": 59,
+                    "cucumber": 50
+                }
+            ]
+        },
+        "20231213": {
+            "iteratiion": 2,
+            "range": [
+                "183414 184557",
+                "185546 190353"
+            ],
+            "food_mass": [
+                {
+                    "Spam": 58,
+                    "red grilled pork": 70,
+                    "cabbage": 82,
+                    "creamy tofu": 62
+                },
+                {
+                    "Spam": 29,
+                    "red grilled pork": 42,
+                    "cabbage": 45,
+                    "creamy tofu": 38
+                }
+            ]
+        }
+    }
+}

@@ -6,6 +6,7 @@ from shutil import move
 from subprocess import call
 from tempfile import NamedTemporaryFile
 from collections import deque
+import argparse
 
 # Global Constants
 FOOD_ID_DICT = {
@@ -36,8 +37,8 @@ FOOD_ID_DICT = {
 
 def load_user_name_format(user_number) -> dict:
     user_dict = {
-            '1': {'name': 'Ken', 're_exp': r'IMG_(?P<date>\d{8})_(?P<time>\d{6})'},
-            '2': {'name': 'Kenrick', 're_exp': r'(?<!IMG_)(?P<date>\d{8})_(?P<time>\d{6})'},
+            'ken': {'name': 'Ken', 're_exp': r'IMG_(?P<date>\d{8})_(?P<time>\d{6})'},
+            'kr': {'name': 'Kenrick', 're_exp': r'(?<!IMG_)(?P<date>\d{8})_(?P<time>\d{6})'},
     }
     return user_dict[user_number]
 
@@ -241,26 +242,29 @@ def debug_func(csv_file_path, user_profile):
 
 
 def main():
+    # Parse user name
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--name",type=str)
+    args = parser.parse_args()
     csv_file_path = os.path.join(os.getcwd(), 'output.csv')
-    user_number = input("Enter User Number (Ken [1], Kenrick [2]): ")
+    user_number = args.name
     user_profile = load_user_name_format(user_number)
-    unfin_dates = create_unfinished_date_list(csv_file_path, user_profile)
-    print(f"Remaining Dates: {unfin_dates}")
 
     # Process unfinished dates
     data_list = list()
-    for date in unfin_dates[:1]:
+    while True:
+        date = ''
+        while not date.strip():
+            date = input()
+
+        if date == '0':
+            break
+
         print(f'date:{date}')
         row_data, user_input_history = process_date_with_image(csv_file_path, date, user_profile)
-        #print(f'row_data:{row_data}\n\n\n')
         data_list.extend(row_data)
         write_to_json('./data.json', user_input_history, user_profile['name'])
 
-    # Write data to CSV
-    # print(f'data_list:{data_list}')
-    #clear_screen()
-    date_range = date if len(unfin_dates) == 1 else f"{unfin_dates[0]} ~ {unfin_dates[-1]}" 
-    print(f"Updates from {date_range} Complete!")
     write_to_csv(csv_file_path, data_list)
 
 

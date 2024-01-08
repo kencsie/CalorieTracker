@@ -41,43 +41,63 @@ if not os.path.exists(dataset_path):
 
 """**Write on CSV file with the annotation files**"""
 
-def process_label_file(file_path):
-    objects = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            parts = line.strip().split()
-            parts_float = [float(coord) for coord in parts[1:]]
-            num_vertices = len(parts_float) // 2
-            assert len(parts_float) % 2 == 0, "The number of coordinates should be even."
-            
-            polygon = np.array(parts_float).reshape(num_vertices, 2)   
-            bounding_box = sv.polygon_to_xyxy(polygon)
-            #print(bounding_box)
+def preprocess_file_name(file_path):
+      concatenated_lines = {}
+      with open(file_path, 'r') as file:
+          for line in file:
+              parts = line.strip().split()
+              line_id = parts[0]
 
-            if len(bounding_box) == 4:  # Ensure there are 4 elements for bounding box
-                object_id, x_center, y_center, width, height = map(float, np.concatenate([[float(parts[0])], bounding_box]))
-                objects.append([object_id, x_center, y_center, width, height, '', '', ''])  # Leaving area and mass empty
+              if line_id in concatenated_lines:
+                  concatenated_lines[line_id] += ' ' + ' '.join(parts[1:])
+              else:
+                  concatenated_lines[line_id] = ' '.join(parts[1:])
+
+      #print(concatenated_lines)
+      #with open('./data.json', 'w') as file:
+      #  json.dump(concatenated_lines, file, indent=4)
+      return concatenated_lines
+
+def process_label_file(file_path):
+    concatenated_lines = preprocess_file_name(file_path)
+    objects = []
+    for line_id in concatenated_lines:
+        line = concatenated_lines[line_id]
+        parts = line.strip().split()
+        parts_float = [float(coord) for coord in parts]
+        num_vertices = len(parts_float) // 2
+        assert len(parts_float) % 2 == 0, "The number of coordinates should be even."
+        
+        polygon = np.array(parts_float).reshape(num_vertices, 2)   
+        bounding_box = sv.polygon_to_xyxy(polygon)
+        #print(bounding_box)
+
+        if len(bounding_box) == 4:  # Ensure there are 4 elements for bounding box
+            object_id, x_center, y_center, width, height = map(float, np.concatenate([[float(line_id)], bounding_box]))
+            objects.append([object_id, x_center, y_center, width, height, '', '', ''])  # Leaving area and mass empty
     return objects
 
 def process_image_mass(file_path):
+    concatenated_lines = preprocess_file_name(file_path)
     image_mass_list = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            parts = line.strip().split()
+    for line_id in concatenated_lines:
+        line = concatenated_lines[line_id]
 
-            if not parts:
-                continue
+        parts = line.strip().split()
 
-            parts_float = [float(coord) for coord in parts[1:]]
-            num_vertices = len(parts_float) // 2
-            assert len(parts_float) % 2 == 0, "The number of coordinates should be even."
-            
-            polygon = np.array(parts_float).reshape(num_vertices, 2)   
-            #Convert from polygon to mask
-            mask = sv.polygon_to_mask((polygon*640).astype(int), (640,640))
-            #Count nonzero pixels
-            image_area = np.count_nonzero(mask)
-            image_mass_list.append(image_area)
+        if not parts:
+            continue
+
+        parts_float = [float(coord) for coord in parts]
+        num_vertices = len(parts_float) // 2
+        assert len(parts_float) % 2 == 0, "The number of coordinates should be even."
+        
+        polygon = np.array(parts_float).reshape(num_vertices, 2)   
+        #Convert from polygon to mask
+        mask = sv.polygon_to_mask((polygon*640).astype(int), (640,640))
+        #Count nonzero pixels
+        image_area = np.count_nonzero(mask)
+        image_mass_list.append(image_area)
             
     return image_mass_list
 

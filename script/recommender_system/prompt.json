@@ -1,0 +1,19 @@
+{
+  "user": {
+    "food": {
+      "Kabayaki sea bream fillet": 52,
+      "apple -sliced-": 54,
+      "cabbage": 95,
+      "egg tofu": 68,
+      "pig blood curd": 53,
+      "rice": 140
+    },
+    "intake":{"calorie":700.98, "protein":28.53, "fat":9.00, "carbohydrate":124.81},
+    "age": 21,
+    "weight": 52,
+    "height": 171,
+    "physical_activity_level": "moderately active",
+    "weight_option": {"option":"gain", "value":300},
+    "TDEE_value": 2307.56
+  }
+}

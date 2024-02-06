@@ -1,0 +1,38 @@
+{
+  "Kabayaki sea bream fillet": {
+    "calorie": 127,
+    "protein": 18.3,
+    "fat": 3.2,
+    "carbohydrate": 6.2
+  },
+  "apple -sliced-": {
+    "calorie": 52,
+    "protein": 0.26,
+    "fat": 0.17,
+    "carbohydrate": 13.81
+  },
+  "cabbage": {
+    "calorie": 42,
+    "protein": 0.99,
+    "fat": 2.79,
+    "carbohydrate": 4.36
+  },
+  "egg tofu": {
+    "calorie": 82.35,
+    "protein": 7.06,
+    "fat": 5.29,
+    "carbohydrate": 1.18
+  },
+  "pig blood curd": {
+    "calorie": 29,
+    "protein": 6.3,
+    "fat": 0.3,
+    "carbohydrate": 0.5
+  },
+  "rice":{
+    "calorie": 354,
+    "protein": 7,
+    "fat": 0.6,
+    "carbohydrate": 77.8
+  }
+}

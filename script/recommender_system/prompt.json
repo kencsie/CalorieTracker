@@ -1,19 +1,25 @@
 {
   "user": {
-    "food": {
-      "Kabayaki sea bream fillet": 52,
-      "apple -sliced-": 54,
-      "cabbage": 95,
-      "egg tofu": 68,
-      "pig blood curd": 53,
-      "rice": 140
-    },
-    "intake":{"calorie":700.98, "protein":28.53, "fat":9.00, "carbohydrate":124.81},
+    "preferred_food": [
+      "Guava -sliced-",
+      "Pumpkin",
+      "Creamy tofu",
+      "Cabbage",
+      "Kabayaki sea bream fillet",
+      "Egg tofu",
+      "Pig blood curd"
+    ],
+    "gender": "m",
     "age": 21,
-    "weight": 52,
-    "height": 171,
-    "physical_activity_level": "moderately active",
-    "weight_option": {"option":"gain", "value":300},
-    "TDEE_value": 2307.56
+    "weight": 52.0,
+    "height": 171.0,
+    "physical_activity_multiplyer": 1.375,
+    "BMR": 1488.75,
+    "TDEE": 2047.03125,
+    "weight_option": {
+      "option": "Gain",
+      "value": 1.0,
+      "daily_intake": 256.6666666666667
+    }
   }
 }

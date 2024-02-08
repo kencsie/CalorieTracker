@@ -1,15 +1,17 @@
 import json
 
+physical_activity_level = {'1':1.2, '2':1.375, '3':1.55, '4':1.725, '5':1.9}
+weight_option = {'1':'Lose', '2':'Maintain', '3':'Gain'}
+
 def calculate_user_intake():
-
-  user_information = {"calorie":0, "protein":0, "fat":0, "carbohydrate":0}
-
   #Read food table
   with open('food.json', 'r') as f:
     food_table = json.load(f)
 
   #Calculate user this meal intake
   with open('prompt.json', 'r') as f:
+    user_information = {"calorie":0, "protein":0, "fat":0, "carbohydrate":0}
+    
     data = json.load(f)
     for key in data['user']['food']:
       user_information['calorie'] += data['user']['food'][key] * (food_table[key]['calorie'] / 100)
@@ -18,52 +20,37 @@ def calculate_user_intake():
       user_information['carbohydrate'] += data['user']['food'][key] * (food_table[key]['carbohydrate'] / 100)
   print(user_information)
 
+  data['user']['intake'] = user_information
+
+  with open('prompt.json', 'w') as f:
+    json.dump(data, f, indent=2)
+
 
 def create_user_prompt():
   prompt_template = """
-User information:
-- Age: {age}
-- Weight: {weight} kg
-- Height: {height} cm
-- Physical activity level: {physical_activity_level}
-- Daily calorie intake so far (including lunch): {calorie} kcal
-- Daily protein intake so far: {protein} g
-- Daily fat intake so far: {fat} g
-- Daily carbohydrate intake so far: {carbohydrate} g
-- Weight goal: {weight_option[option]} by {weight_option[value]} calories
-- Total Daily Energy Expenditure (TDEE): {TDEE} calories
+  User Information:
+  - Age: {age}
+  - Weight: {weight} kg
+  - Height: {height} cm
+  - Physical Activity Level: {physical_activity_multiplyer}
+  - Total Daily Energy Expenditure (TDEE): {TDEE} calories
+  - Weight Goal: {weight_option} by adjusting daily calorie intake by {weight_daily_intake} calories
+  - Daily calorie intake so far (breakfast only): 400 kcal
 
-Considering the intake so far is for lunch, suggest a balanced meal plan for dinner that aligns with the user's dietary needs and weight goal. The dinner plan should help the user meet their remaining daily nutritional requirements without exceeding the TDEE, considering the goal to {weight_option[option]} weight by adjusting daily calorie intake by {weight_option[value]} calories.
+  Given the user's initial breakfast intake of 400 calories, recommend a comprehensive meal plan for lunch and dinner that aligns with the user's dietary needs and weight management goals. This plan should ensure the user does not exceed their TDEE of {TDEE} calories while aiming to {weight_option} weight by adjusting daily calorie intake by {weight_daily_intake} calories.
 
-Foods available for dinner:
-1. Kabayaki sea bream fillet
-2. Spam
-3. Apple -sliced-
-4. Cabbage
-5. Coin
-6. Creamy tofu
-7. Creamy tofu -without sauce-
-8. Cucumber
-9. Egg tofu
-10. Firm tofu
-11. Fish cake
-12. Fried chicken cutlet
-13. Fried potato
-14. Grilled pork
-15. Guava -sliced-
-16. Mustard greens
-17. Pig blood curd
-18. Pig liver
-19. Pineapple
-20. Pumpkin
-21. Red grilled pork
-22. Soy egg
-23. Sweet potato leaves
-24. Rice
+  Available Foods with Nutritional Information(per 100g serving):
+  - Seafood: Kabayaki sea bream fillet (127 kcal, 18.3g protein, 3.2g fat, 6.2g carbs), Fish cake (201 kcal, 13.65g protein, 10.49g fat, 12.38g carbs)
+  - Meat and Meat Products: Spam (292 kcal, 15g protein, 24.3g fat, 3.2g carbs), Pig blood curd (29 kcal, 6.3g protein, 0.3g fat, 0.5g carbs)
+  - Tofu and Tofu Products: Creamy tofu (196 kcal, 13.4g protein, 13.4g fat, 6.3g carbs), Egg tofu (82.35 kcal, 7.06g protein, 5.29g fat, 1.18g carbs)
+  - Vegetables: Cabbage (42 kcal, 0.99g protein, 2.79g fat, 4.36g carbs), Pumpkin (115 kcal, 2.7g protein, 4.38g fat, 19.85g carbs)
+  - Fruits: Apple -sliced- (52 kcal, 0.26g protein, 0.17g fat, 13.81g carbs), Guava -sliced- (68 kcal, 2.55g protein, 0.95g fat, 14.32g carbs)
+  - Starchy Foods: Fried potato (125 kcal, 2.41g protein, 3.25g fat, 22.05g carbs), Rice (354 kcal, 7g protein, 0.6g fat, 77.8g carbs)
 
-The meal plan should consider not only the caloric content but also the balance of macronutrients (proteins, fats, carbohydrates) to ensure the user's nutritional needs are met by the end of the day. Please provide suggestions for dinner that contribute to the user's health and weight management goals.
-"""
+  The meal plan should prioritize the user's preferred foods where possible: {preferred food}. It should also balance macronutrients (proteins, fats, carbohydrates) effectively, contributing towards the user's health and weight management objectives.
 
+  Based on the nutritional information provided for each available food, construct lunch and dinner suggestions that help the user meet their remaining daily nutritional requirements without exceeding the TDEE, considering the goal to {weight_option} weight by adjusting daily calorie intake by {weight_daily_intake} calories.
+  """
 
   with open('prompt.json', 'r') as f:
     user = json.load(f)['user']
@@ -72,13 +59,11 @@ The meal plan should consider not only the caloric content but also the balance 
       "age": user['age'],
       "weight": user['weight'],
       "height": user['height'],
-      "physical_activity_level":  user['physical_activity_level'],
-      "calorie": user['intake']['calorie'],
-      "protein": user['intake']['protein'],
-      "fat": user['intake']['fat'],
-      "carbohydrate": user['intake']['carbohydrate'],
-      "weight_option": user['weight_option'],
-      "TDEE": user['TDEE_value']
+      "physical_activity_multiplyer":  user['physical_activity_multiplyer'],
+      "TDEE": user['TDEE'],
+      "weight_option": user['weight_option']['option'],
+      "weight_daily_intake": user['weight_option']['daily_intake'],
+      "preferred food": user['preferred_food']
   }
 
   # Filling in the template with the user's data
@@ -92,5 +77,28 @@ The meal plan should consider not only the caloric content but also the balance 
 
   print(f"Prompt saved to {filename}.")
 
+def modify_user_information():
+  with open('prompt.json', 'r') as f:
+    user = json.load(f)
+    user['user']['gender'] = input("Please type your gender(m/f):")
+    user['user']['age'] = int(input("Please type your age(y):"))
+    user['user']['weight'] = float(input("Please type your weight(kg):"))
+    user['user']['height'] = float(input("Please type your height(cm):"))
+    user['user']['physical_activity_multiplyer'] = physical_activity_level[input("Please type your physical activity level(number):\n1.Sedentary\n2.Lightly active\n3.Moderately active\n4.Very active\n5.Super active\n")]
+    
+    BMR_offset = 5 if user['user']['gender'] == 'm' else -161
+    user['user']['BMR'] = (10 * user['user']['weight']) + (6.25 * user['user']['height']) - (5 * user['user']['age']) + BMR_offset
+    user['user']['TDEE'] = user['user']['BMR'] * user['user']['physical_activity_multiplyer']
 
+    user['user']['weight_option'] = {}
+    user['user']['weight_option']['option'] = weight_option[input("Please type your weight goal:\n1.Lose weight\n2.Maintain weight\n3.Gain weight\n")]
+    user['user']['weight_option']['value'] = float(input("Please type your weight goal value for a month(kg):"))
+    user['user']['weight_option']['daily_intake'] = user['user']['weight_option']['value'] * 7700 / 30
+
+  with open('prompt.json', 'w') as f:
+    json.dump(user, f, indent=2)
+
+
+#calculate_user_intake()
+modify_user_information()
 create_user_prompt()

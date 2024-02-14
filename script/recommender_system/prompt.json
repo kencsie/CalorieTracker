@@ -1,5 +1,13 @@
 {
   "user": {
+    "food": {
+      "Kabayaki sea bream fillet": 27,
+      "Apple -sliced-": 25,
+      "Pumpkin": 27,
+      "Cabbage": 40,
+      "Steamed egg": 25,
+      "Rice": 140
+    },
     "preferred_food": [
       "Guava -sliced-",
       "Pumpkin",
@@ -9,6 +17,12 @@
       "Egg tofu",
       "Pig blood curd"
     ],
+    "intake": {
+      "calorie": 580.11,
+      "protein": 16.2686,
+      "fat": 3.785,
+      "carbohydrate": 118.2093
+    },
     "gender": "m",
     "age": 21,
     "weight": 52.0,

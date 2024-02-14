@@ -25,7 +25,6 @@ def calculate_user_intake():
   with open('prompt.json', 'w') as f:
     json.dump(data, f, indent=2)
 
-
 def create_user_prompt():
   prompt_template = """
   User Information:

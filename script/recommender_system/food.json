@@ -48,10 +48,10 @@
     "carbohydrate": 22.05
   },
   "Pumpkin":{
-    "calorie": 115,
-    "protein": 2.7,
-    "fat": 4.38,
-    "carbohydrate": 19.85
+    "calorie": 46,
+    "protein": 1.08,
+    "fat": 1.75,
+    "carbohydrate": 7.94
   },
   "Creamy tofu":{
     "calorie": 196,
@@ -70,5 +70,11 @@
     "protein": 13.65,
     "fat": 10.49,
     "carbohydrate": 12.38
+  },
+  "Steamed egg":{
+    "calorie": 32,
+    "protein": 3.1,
+    "fat": 1.8,
+    "carbohydrate": 1.1
   }
 }

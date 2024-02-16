@@ -9,3 +9,10 @@ comment.txt
 **/Food-[0-9][0-9][0-9]/
 **/weights/
 **/yolov5
+
+#python files
+**/__pycache__
+**/.pytest_cache
+
+#env variable
+**.env

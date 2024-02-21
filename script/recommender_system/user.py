@@ -28,27 +28,31 @@ def calculate_user_intake():
 def create_user_prompt():
   prompt_template = """
   User Information:
-  - Age: {age}
-  - Weight: {weight} kg
-  - Height: {height} cm
-  - Physical Activity Level: {physical_activity_multiplyer}
-  - Total Daily Energy Expenditure (TDEE): {TDEE} calories
-  - Weight Goal: {weight_option} by adjusting daily calorie intake by {weight_daily_intake} calories
-  - Daily calorie intake so far (breakfast only): 400 kcal
 
-  Given the user's initial breakfast intake of 400 calories, recommend a comprehensive meal plan for lunch and dinner that aligns with the user's dietary needs and weight management goals. This plan should ensure the user does not exceed their TDEE of {TDEE} calories while aiming to {weight_option} weight by adjusting daily calorie intake by {weight_daily_intake} calories.
+  Age: {age}
+  Weight: {weight} kg
+  Height: {height} cm
+  Physical Activity Level: {physical_activity_multiplier}
+  Develop a daily meal plan that strictly adheres to the Health TEA recommendations for nutritional intake. The goals for the day are:
 
-  Available Foods with Nutritional Information(per 100g serving):
-  - Seafood: Kabayaki sea bream fillet (127 kcal, 18.3g protein, 3.2g fat, 6.2g carbs), Fish cake (201 kcal, 13.65g protein, 10.49g fat, 12.38g carbs)
-  - Meat and Meat Products: Spam (292 kcal, 15g protein, 24.3g fat, 3.2g carbs), Pig blood curd (29 kcal, 6.3g protein, 0.3g fat, 0.5g carbs)
-  - Tofu and Tofu Products: Creamy tofu (196 kcal, 13.4g protein, 13.4g fat, 6.3g carbs), Egg tofu (82.35 kcal, 7.06g protein, 5.29g fat, 1.18g carbs)
-  - Vegetables: Cabbage (42 kcal, 0.99g protein, 2.79g fat, 4.36g carbs), Pumpkin (115 kcal, 2.7g protein, 4.38g fat, 19.85g carbs)
-  - Fruits: Apple -sliced- (52 kcal, 0.26g protein, 0.17g fat, 13.81g carbs), Guava -sliced- (68 kcal, 2.55g protein, 0.95g fat, 14.32g carbs)
-  - Starchy Foods: Fried potato (125 kcal, 2.41g protein, 3.25g fat, 22.05g carbs), Rice (354 kcal, 7g protein, 0.6g fat, 77.8g carbs)
+  Carbohydrates: 180 grams
+  Protein: 42 grams
+  Vegetables: Approximately 375 grams
+  Fruits: Approximately 240 grams
+  Fat: 25 grams
+  Since the user has consumed a 400-calorie breakfast, the meal plan should strategically allocate the remainder of the daily nutritional targets across lunch and dinner.
 
-  The meal plan should prioritize the user's preferred foods where possible: {preferred food}. It should also balance macronutrients (proteins, fats, carbohydrates) effectively, contributing towards the user's health and weight management objectives.
+  Please prioritize the following available foods with their nutritional content (per 100g serving), adjusting the amounts to meet the exact nutritional targets:
+  //Food list
+  
+  The meal plan should incorporate the user's preferred foods: {preferred food}, ensuring the following:
 
-  Based on the nutritional information provided for each available food, construct lunch and dinner suggestions that help the user meet their remaining daily nutritional requirements without exceeding the TDEE, considering the goal to {weight_option} weight by adjusting daily calorie intake by {weight_daily_intake} calories.
+  Correct proportions of macronutrients to fulfill health objectives.
+  Accurate serving sizes to meet the specific gram targets for each food group.
+  A diverse range of foods to provide a balanced intake of nutrients.
+  Formulate lunch and dinner menus that will bring the user's total daily intake in line with the Health TEA recommendations. The menus should be designed to maximize nutritional value while satisfying taste preferences. It is essential that the meal plan does not exceed the specified daily limits for each macronutrient and aligns precisely with the serving size definitions.
+
+  Please adjust the quantities of each food item so that the total fat content does not surpass 25 grams and the total intake of vegetables and fruits meets the required amounts in grams. If any macronutrient exceeds the daily goal, suggest alternative quantities or food items that will correct the imbalance.
   """
 
   with open('prompt.json', 'r') as f:
@@ -58,7 +62,7 @@ def create_user_prompt():
       "age": user['age'],
       "weight": user['weight'],
       "height": user['height'],
-      "physical_activity_multiplyer":  user['physical_activity_multiplyer'],
+      "physical_activity_multiplier":  user['physical_activity_multiplyer'],
       "TDEE": user['TDEE'],
       "weight_option": user['weight_option']['option'],
       "weight_daily_intake": user['weight_option']['daily_intake'],

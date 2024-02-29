@@ -9,7 +9,6 @@ we here use a small subset of it.
 """
 
 import os
-
 import optuna
 from optuna.trial import TrialState
 import torch
@@ -17,16 +16,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data
+from torch.utils.data import DataLoader, TensorDataset
 from torchvision import datasets
 from torchvision import transforms
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
 
 
-DEVICE = torch.device("cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCHSIZE = 128
-CLASSES = 10
 DIR = os.getcwd()
 EPOCHS = 10
-N_TRAIN_EXAMPLES = BATCHSIZE * 30
+N_TRAIN_EXAMPLES = BATCHSIZE * 300
 N_VALID_EXAMPLES = BATCHSIZE * 10
 
 
@@ -35,7 +36,7 @@ def define_model(trial):
     n_layers = trial.suggest_int("n_layers", 1, 3)
     layers = []
 
-    in_features = 28 * 28
+    in_features = 8
     for i in range(n_layers):
         out_features = trial.suggest_int("n_units_l{}".format(i), 4, 128)
         layers.append(nn.Linear(in_features, out_features))
@@ -44,30 +45,29 @@ def define_model(trial):
         layers.append(nn.Dropout(p))
 
         in_features = out_features
-    layers.append(nn.Linear(in_features, CLASSES))
-    layers.append(nn.LogSoftmax(dim=1))
+    layers.append(nn.Linear(in_features, 1))
 
     return nn.Sequential(*layers)
 
 
-def get_mnist():
-    # Load FashionMNIST dataset.
-    train_loader = torch.utils.data.DataLoader(
-        datasets.FashionMNIST(DIR, train=True, download=True, transform=transforms.ToTensor()),
-        batch_size=BATCHSIZE,
-        shuffle=True,
-    )
-    valid_loader = torch.utils.data.DataLoader(
-        datasets.FashionMNIST(DIR, train=False, transform=transforms.ToTensor()),
-        batch_size=BATCHSIZE,
-        shuffle=True,
-    )
+def get_california_housing():
+    # Load california_housing dataset.
+    housing = fetch_california_housing()
+    # Split the dataset into training and testing sets
+    X_train, X_valid, y_train, y_valid = train_test_split(housing.data, housing.target, test_size=0.2, random_state=42)
+
+    train_ds = TensorDataset(torch.tensor(X_train, dtype=torch.float), torch.tensor(y_train, dtype=torch.float))
+    valid_ds = TensorDataset(torch.tensor(X_valid, dtype=torch.float), torch.tensor(y_valid, dtype=torch.float))
+
+    train_loader = DataLoader(train_ds, batch_size=BATCHSIZE, shuffle=True, num_workers=4)
+    valid_loader = DataLoader(valid_ds, batch_size=BATCHSIZE, shuffle=False, num_workers=4)
 
     return train_loader, valid_loader
 
 
 def objective(trial):
     # Generate the model.
+    criterion = nn.MSELoss() # mean squared error loss
     model = define_model(trial).to(DEVICE)
 
     # Generate the optimizers.
@@ -76,7 +76,7 @@ def objective(trial):
     optimizer = getattr(optim, optimizer_name)(model.parameters(), lr=lr)
 
     # Get the FashionMNIST dataset.
-    train_loader, valid_loader = get_mnist()
+    train_loader, valid_loader = get_california_housing()
 
     # Training of the model.
     for epoch in range(EPOCHS):
@@ -90,13 +90,13 @@ def objective(trial):
 
             optimizer.zero_grad()
             output = model(data)
-            loss = F.nll_loss(output, target)
+            loss = criterion(output, target.view_as(output))
             loss.backward()
             optimizer.step()
 
         # Validation of the model.
         model.eval()
-        correct = 0
+        mse_loss = 0
         with torch.no_grad():
             for batch_idx, (data, target) in enumerate(valid_loader):
                 # Limiting validation data.
@@ -104,23 +104,21 @@ def objective(trial):
                     break
                 data, target = data.view(data.size(0), -1).to(DEVICE), target.to(DEVICE)
                 output = model(data)
-                # Get the index of the max log-probability.
-                pred = output.argmax(dim=1, keepdim=True)
-                correct += pred.eq(target.view_as(pred)).sum().item()
+                mse_loss += criterion(output, target.view_as(output))
 
-        accuracy = correct / min(len(valid_loader.dataset), N_VALID_EXAMPLES)
+        mse_loss /= min(len(valid_loader.dataset), N_VALID_EXAMPLES)
 
-        trial.report(accuracy, epoch)
+        trial.report(mse_loss, epoch)
 
         # Handle pruning based on the intermediate value.
         if trial.should_prune():
             raise optuna.exceptions.TrialPruned()
 
-    return accuracy
+    return mse_loss
 
 
 if __name__ == "__main__":
-    study = optuna.create_study(direction="maximize")
+    study = optuna.create_study(direction="minimize")
     study.optimize(objective, n_trials=100, timeout=600)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])

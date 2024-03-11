@@ -14,7 +14,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCHSIZE = 32
 EPOCHS = 100
-INPUT_FEATURES = 13
+INPUT_FEATURES = 24
 TRIAL = 1000
 
 

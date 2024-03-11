@@ -59,6 +59,15 @@ def calculate_mape_per_food_item(preds, targets, ids):
         mape_per_food_item[uid] = mape.item()
     return mape_per_food_item
 
+def calculate_smape_per_food_item(preds, targets, ids):
+    unique_ids = torch.unique(ids).numpy()
+    smape_per_food_item = {}
+    for uid in unique_ids:
+        indices = ids == uid
+        smape = torch.mean(torch.abs(preds[indices] - targets[indices]) / (torch.abs(preds[indices]) + torch.abs(targets[indices]))) * 100
+        smape_per_food_item[uid] = smape.item()
+    return smape_per_food_item
+
 def plot_rmse_per_food_item(rmse_per_food_item, food_id_dict, filename='rmse_per_food_item.png'):
     # Sort the rmse_per_food_item by the food ID keys and match them with food names using the food_id_dict
     sorted_items = sorted(rmse_per_food_item.items(), key=lambda x: float(x[0]))
@@ -91,6 +100,27 @@ def plot_mape_per_food_item(mape_per_food_item, food_id_dict, filename='mape_per
     plt.xlabel('Food Type', fontsize=12)
     plt.ylabel('MAPE', fontsize=12)
     plt.title('MAPE for Each Food Type', fontsize=14)
+    plt.xticks(rotation=90, fontsize=10)  # Rotate labels to prevent overlap
+
+    # Add the text labels above the bars
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, yval + 0.05, round(yval, 2), ha='center', va='bottom', fontsize=8)
+    
+    # Save the figure to a file
+    plt.savefig(filename, bbox_inches='tight')  # bbox_inches='tight' minimizes the extra whitespace around the figure.
+
+def plot_smape_per_food_item(smape_per_food_item, food_id_dict, filename='smape_per_food_item.png'):
+    # Sort the smape_per_food_item by the food ID keys and match them with food names using the food_id_dict
+    sorted_items = sorted(smape_per_food_item.items(), key=lambda x: float(x[0]))
+    labels = [food_id_dict[str(uid)] for uid, _ in sorted_items]
+    smape_values = [smape for _, smape in sorted_items]
+
+    plt.figure(figsize=(15, 10))  # Increased figure size for readability
+    bars = plt.bar(labels, smape_values, color='lightgreen')
+    plt.xlabel('Food Type', fontsize=12)
+    plt.ylabel('SMAPE', fontsize=12)
+    plt.title('SMAPE for Each Food Type', fontsize=14)
     plt.xticks(rotation=90, fontsize=10)  # Rotate labels to prevent overlap
 
     # Add the text labels above the bars
@@ -270,11 +300,17 @@ def main():
     # Calculate MAPE per food item
     mape_per_food_item = calculate_mape_per_food_item(all_preds, all_targets, all_ids)
 
+    # Calculate SMAPE per food item
+    smape_per_food_item = calculate_smape_per_food_item(all_preds, all_targets, all_ids)
+
     # Plot RMSE per food item
     plot_rmse_per_food_item(rmse_per_food_item, FOOD_ID_DICT)
 
     # Plot MAPE per food item
     plot_mape_per_food_item(mape_per_food_item, FOOD_ID_DICT)
+
+    # Plot SMAPE per food item
+    plot_smape_per_food_item(smape_per_food_item, FOOD_ID_DICT)
 
     return rmse_loss
 

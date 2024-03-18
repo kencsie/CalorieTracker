@@ -25,7 +25,7 @@ import cv2
 import supervision as sv
 
 HOME = os.getcwd()
-VERSION = 18
+VERSION = 20
 # print("HOME:", HOME)
 
 """**Download dataset from Roboflow**"""
@@ -122,7 +122,7 @@ def adjust_image_name(image_name):
 def process_dataset(dataset_path, output_csv):
     processed_images = get_processed_images(output_csv)
     data_to_write = []
-    for folder in ['train', 'test', 'valid']:
+    for folder in ['train']:
         label_path = os.path.join(dataset_path, folder, 'labels')
         for label_file in os.listdir(label_path):
             if label_file.endswith('.txt'):
@@ -182,7 +182,7 @@ def process_images_and_create_masks(dataset_path, csv_file):
         csv_data = list(reader)
 
     rows_temp = []
-    for folder in ['train', 'test', 'valid']:
+    for folder in ['train']:
         image_folder_path = os.path.join(dataset_path, folder, 'images')
         for image_file in os.listdir(image_folder_path):
             image_name = os.path.splitext(image_file)[0]

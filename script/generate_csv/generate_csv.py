@@ -25,7 +25,7 @@ import cv2
 import supervision as sv
 
 HOME = os.getcwd()
-VERSION = 20
+VERSION = 21
 # print("HOME:", HOME)
 
 """**Download dataset from Roboflow**"""

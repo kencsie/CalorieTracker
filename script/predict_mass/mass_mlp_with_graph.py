@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -131,6 +132,17 @@ def plot_smape_per_food_item(smape_per_food_item, food_id_dict, filename='smape_
     # Save the figure to a file
     plt.savefig(filename, bbox_inches='tight')  # bbox_inches='tight' minimizes the extra whitespace around the figure.
 
+def plot_loss_curves(mean_train_losses, mean_valid_losses, filename='loss_curves.png'):
+    plt.figure(figsize=(10, 6))
+    plt.plot(mean_train_losses, label='Training loss', color='blue')
+    plt.plot(mean_valid_losses, label='Validation loss', color='red')
+    plt.xlabel('Epoch', fontsize=12)
+    plt.ylabel('Loss', fontsize=12)
+    plt.title('Training and Validation Loss Curves', fontsize=14)
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(filename, bbox_inches='tight')
+
 def define_model():
     class MLP(nn.Module):
       def __init__(self):
@@ -248,8 +260,14 @@ def main():
     X, y, X_object_id = get_csv_data()
     train_loader, valid_loader = get_csv_dataloader(X, y, X_object_id)
 
+    mean_train_losses = []
+    mean_valid_losses = []
+
     # Training of the model.
     for epoch in range(EPOCHS):
+        train_losses = []
+        valid_losses = []
+
         model.train()
         for batch_idx, (data, target, id) in enumerate(train_loader):
             data, target = data.view(data.size(0), -1).to(DEVICE), target.to(DEVICE)
@@ -260,21 +278,24 @@ def main():
             loss.backward()
             optimizer.step()
 
+            train_losses.append(loss.item())
+
         # Validation of the model.
         model.eval()
-        mse_loss = 0
-        count = 0
         with torch.no_grad():
             for batch_idx, (data, target, id) in enumerate(valid_loader):
                 data, target = data.view(data.size(0), -1).to(DEVICE), target.to(DEVICE)
                 output = model(data)
-                mse_loss += criterion(output, target.view_as(output))
-                count += 1
+                loss = criterion(output, target.view_as(output))
 
-        mse_loss /= count
-        rmse_loss = torch.sqrt(mse_loss).item()
-        print(f'Epoch {epoch+1}/{EPOCHS}, MSE: {mse_loss:.4f}')
-        print(f'RMSE:{rmse_loss:.4f}')
+                valid_losses.append(loss.item())
+
+        mean_train_losses.append(np.mean(train_losses))
+        mean_valid_losses.append(np.mean(valid_losses))
+        print(f'epoch: {epoch+1}/{EPOCHS}, train (MSE/RMSE): {np.mean(train_losses):.2f}/{np.sqrt(np.mean(train_losses)):.2f}, valid (MSE/RMSE): {np.mean(valid_losses):.2f}/{np.sqrt(np.mean(valid_losses)):.2f}')
+        
+    # Plot the loss curves
+    plot_loss_curves(mean_train_losses, mean_valid_losses)
 
     # Model evaluation modifications start here
     model.eval()
@@ -311,8 +332,6 @@ def main():
 
     # Plot SMAPE per food item
     plot_smape_per_food_item(smape_per_food_item, FOOD_ID_DICT)
-
-    return rmse_loss
 
 
 if __name__ == "__main__":

@@ -10,11 +10,12 @@ from torch.utils.data import Dataset, DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import matplotlib.pyplot as plt
+from category_encoders import BinaryEncoder
+
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCHSIZE = 32
 EPOCHS = 100
-INPUT_FEATURES = 24
 
 FOOD_ID_DICT = {
     "0.0": "Kabayaki sea bream fillet",
@@ -60,15 +61,6 @@ def calculate_mape_per_food_item(preds, targets, ids):
         mape_per_food_item[uid] = mape.item()
     return mape_per_food_item
 
-def calculate_smape_per_food_item(preds, targets, ids):
-    unique_ids = torch.unique(ids).numpy()
-    smape_per_food_item = {}
-    for uid in unique_ids:
-        indices = ids == uid
-        smape = torch.mean(torch.abs(preds[indices] - targets[indices]) / (torch.abs(preds[indices]) + torch.abs(targets[indices]))) * 100
-        smape_per_food_item[uid] = smape.item()
-    return smape_per_food_item
-
 def plot_rmse_per_food_item(rmse_per_food_item, food_id_dict, filename='rmse_per_food_item.png'):
     # Sort the rmse_per_food_item by the food ID keys and match them with food names using the food_id_dict
     sorted_items = sorted(rmse_per_food_item.items(), key=lambda x: float(x[0]))
@@ -111,27 +103,6 @@ def plot_mape_per_food_item(mape_per_food_item, food_id_dict, filename='mape_per
     # Save the figure to a file
     plt.savefig(filename, bbox_inches='tight')  # bbox_inches='tight' minimizes the extra whitespace around the figure.
 
-def plot_smape_per_food_item(smape_per_food_item, food_id_dict, filename='smape_per_food_item.png'):
-    # Sort the smape_per_food_item by the food ID keys and match them with food names using the food_id_dict
-    sorted_items = sorted(smape_per_food_item.items(), key=lambda x: float(x[0]))
-    labels = [food_id_dict[str(uid)] for uid, _ in sorted_items]
-    smape_values = [smape for _, smape in sorted_items]
-
-    plt.figure(figsize=(15, 10))  # Increased figure size for readability
-    bars = plt.bar(labels, smape_values, color='lightgreen')
-    plt.xlabel('Food Type', fontsize=12)
-    plt.ylabel('SMAPE', fontsize=12)
-    plt.title('SMAPE for Each Food Type', fontsize=14)
-    plt.xticks(rotation=90, fontsize=10)  # Rotate labels to prevent overlap
-
-    # Add the text labels above the bars
-    for bar in bars:
-        yval = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2, yval + 0.05, round(yval, 2), ha='center', va='bottom', fontsize=8)
-    
-    # Save the figure to a file
-    plt.savefig(filename, bbox_inches='tight')  # bbox_inches='tight' minimizes the extra whitespace around the figure.
-
 def plot_loss_curves(mean_train_losses, mean_valid_losses, filename='loss_curves.png'):
     plt.figure(figsize=(10, 6))
     plt.plot(mean_train_losses, label='Training loss', color='blue')
@@ -143,16 +114,18 @@ def plot_loss_curves(mean_train_losses, mean_valid_losses, filename='loss_curves
     plt.grid(True)
     plt.savefig(filename, bbox_inches='tight')
 
-def define_model():
+def define_model(input_features):
     class MLP(nn.Module):
       def __init__(self):
           super().__init__()
-          self.fc1 = nn.Linear(INPUT_FEATURES, 97)
-          self.fc2 = nn.Linear(97, 128)
-          self.fc3 = nn.Linear(128, 1)
+          self.fc1 = nn.Linear(input_features, 125)
+          self.fc2 = nn.Linear(125, 46)
+          self.fc3 = nn.Linear(46, 124)
+          self.fc4 = nn.Linear(124, 1)
           self.relu = nn.ReLU()
-          self.dropout1 = nn.Dropout(0.3336182856425359)
-          self.dropout2 = nn.Dropout(0.21470682429854432)
+          self.dropout1 = nn.Dropout(0.44497787519607357)
+          self.dropout2 = nn.Dropout(0.1634722800333409)
+          self.dropout3 = nn.Dropout(0.39846244223627525)
 
       #this is mandatory
       def forward(self, x):
@@ -160,7 +133,9 @@ def define_model():
           x = self.dropout1(x)
           x = self.relu(self.fc2(x))
           x = self.dropout2(x)
-          x = self.fc3(x)
+          x = self.relu(self.fc3(x))
+          x = self.dropout3(x)
+          x = self.fc4(x)
           return x
 
     return MLP()
@@ -176,19 +151,10 @@ def get_csv_data():
         data.dropna(subset=['area'], inplace=True)
         data.dropna(subset=['mass'], inplace=True)
         return data
-    
-    def csv_drop_less_than_30(data):
-        # Calculate ID counts
-        value_counts = data['object_id'].value_counts()
-        
-        # Drop row less than 30
-        keep_table = value_counts >= 30
-        ids_to_keep = value_counts[keep_table].index
-        return data[data['object_id'].isin(ids_to_keep)]
 
     def csv_drop_unnecessary_columns(data):
         # Drop unnecessary columns
-        return data.drop(columns=['object_id','mass', 'image_name', 'x_center', 'y_center', 'width', 'height'], axis=1)
+        return data.drop(columns=['image_area','object_id','mass', 'image_name', 'x_center', 'y_center', 'width', 'height'], axis=1)
 
     def csv_one_hot_encode(data):
         # One-hot encode the 'object_id' column
@@ -199,18 +165,31 @@ def get_csv_data():
         X_cat_one_hot_df = pd.DataFrame(X_cat_one_hot, columns=encoder.get_feature_names_out(['object_id']))
         return X_cat_one_hot_df
 
+    def csv_binary_encode(data):
+        # Check if 'object_id' column is in the data
+        if 'object_id' in data:
+            # Initialize the Binary Encoder
+            encoder = BinaryEncoder(cols=['object_id'])
+            
+            # Fit and transform the data to binary encoding
+            data_binary_encoded = encoder.fit_transform(data['object_id'])
+            
+            # The BinaryEncoder returns a DataFrame so you can directly return it
+            return data_binary_encoded
+        else:
+            raise ValueError("Column 'object_id' is not in the DataFrame")
+
     # Data Preprocessing
     data = load_food_csv()
     data = csv_remove_nan(data)
-    data = csv_drop_less_than_30(data)
 
     # Drop unnecessary features
     X = csv_drop_unnecessary_columns(data)
     # concatinate the one-hot encoded columns
     X.reset_index(drop=True, inplace=True)
-    X = pd.concat([X, csv_one_hot_encode(data)], axis=1)
+    X = pd.concat([X, csv_binary_encode(data)], axis=1)
     # Generate feature and target data
-    X = StandardScaler().fit_transform(X)
+    X = X.to_numpy()
     y = data['mass'].copy()
     #print(f'X.shape:{X.shape}, y.shape:{y.shape}, object_id.shape:{data["object_id"].shape}')
 
@@ -235,6 +214,12 @@ def get_csv_dataloader(X, y, X_object_id):
         X, y, X_object_id, test_size=0.2, random_state=42
     )
 
+    # Standardize the data
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    X_train = scaler.transform(X_train)
+    X_test = scaler.transform(X_test)
+
     # Convert to PyTorch tensors
     X_train, X_test, y_train, y_test, ids_train, ids_test = map(
         torch.tensor, (X_train, X_test, y_train.to_numpy(), y_test.to_numpy(), ids_train.to_numpy(), ids_test.to_numpy())
@@ -251,14 +236,14 @@ def get_csv_dataloader(X, y, X_object_id):
     return train_loader, test_loader
 
 def main():
-    # Generate the model.
-    model = define_model().to(DEVICE)
-    criterion = nn.MSELoss() # mean squared error loss
-    optimizer = optim.RMSprop(model.parameters(), lr=0.0023892935186788345)
-
     # Get the food dataset.
     X, y, X_object_id = get_csv_data()
     train_loader, valid_loader = get_csv_dataloader(X, y, X_object_id)
+
+    # Generate the model.
+    model = define_model(X.shape[1]).to(DEVICE)
+    criterion = nn.MSELoss() # mean squared error loss
+    optimizer = optim.RMSprop(model.parameters(), lr=0.0022520609871247346)
 
     mean_train_losses = []
     mean_valid_losses = []
@@ -321,18 +306,11 @@ def main():
     # Calculate MAPE per food item
     mape_per_food_item = calculate_mape_per_food_item(all_preds, all_targets, all_ids)
 
-    # Calculate SMAPE per food item
-    smape_per_food_item = calculate_smape_per_food_item(all_preds, all_targets, all_ids)
-
     # Plot RMSE per food item
     plot_rmse_per_food_item(rmse_per_food_item, FOOD_ID_DICT)
 
     # Plot MAPE per food item
     plot_mape_per_food_item(mape_per_food_item, FOOD_ID_DICT)
-
-    # Plot SMAPE per food item
-    plot_smape_per_food_item(smape_per_food_item, FOOD_ID_DICT)
-
 
 if __name__ == "__main__":
     main()

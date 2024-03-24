@@ -10,25 +10,24 @@ import torch.utils.data
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from category_encoders import BinaryEncoder
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCHSIZE = 32
 EPOCHS = 100
-INPUT_FEATURES = 24
 TRIAL = 1000
 
 
-def define_model(trial):
+def define_model(trial, in_features):
     # We optimize the number of layers, hidden units and dropout ratio in each layer.
     n_layers = trial.suggest_int("n_layers", 1, 3)
     layers = []
 
-    in_features = INPUT_FEATURES
     for i in range(n_layers):
         out_features = trial.suggest_int("n_units_l{}".format(i), 4, 128)
         layers.append(nn.Linear(in_features, out_features))
         layers.append(nn.ReLU())
-        p = trial.suggest_float("dropout_l{}".format(i), 0.2, 0.5)
+        p = trial.suggest_float("dropout_l{}".format(i), 0.1, 0.5)
         layers.append(nn.Dropout(p))
 
         in_features = out_features
@@ -47,19 +46,10 @@ def get_csv_data():
         data.dropna(subset=['area'], inplace=True)
         data.dropna(subset=['mass'], inplace=True)
         return data
-    
-    def csv_drop_less_than_30(data):
-        # Calculate ID counts
-        value_counts = data['object_id'].value_counts()
-        
-        # Drop row less than 30
-        keep_table = value_counts >= 30
-        ids_to_keep = value_counts[keep_table].index
-        return data[data['object_id'].isin(ids_to_keep)]
 
     def csv_drop_unnecessary_columns(data):
         # Drop unnecessary columns
-        return data.drop(columns=['object_id','mass', 'image_name', 'x_center', 'y_center', 'width', 'height'], axis=1)
+        return data.drop(columns=['image_area','object_id','mass', 'image_name', 'x_center', 'y_center', 'width', 'height'], axis=1)
 
     def csv_one_hot_encode(data):
         # One-hot encode the 'object_id' column
@@ -70,18 +60,31 @@ def get_csv_data():
         X_cat_one_hot_df = pd.DataFrame(X_cat_one_hot, columns=encoder.get_feature_names_out(['object_id']))
         return X_cat_one_hot_df
 
+    def csv_binary_encode(data):
+        # Check if 'object_id' column is in the data
+        if 'object_id' in data:
+            # Initialize the Binary Encoder
+            encoder = BinaryEncoder(cols=['object_id'])
+            
+            # Fit and transform the data to binary encoding
+            data_binary_encoded = encoder.fit_transform(data['object_id'])
+            
+            # The BinaryEncoder returns a DataFrame so you can directly return it
+            return data_binary_encoded
+        else:
+            raise ValueError("Column 'object_id' is not in the DataFrame")
+
     # Data Preprocessing
     data = load_food_csv()
     data = csv_remove_nan(data)
-    data = csv_drop_less_than_30(data)
 
     # Drop unnecessary features
     X = csv_drop_unnecessary_columns(data)
     # concatinate the one-hot encoded columns
     X.reset_index(drop=True, inplace=True)
-    X = pd.concat([X, csv_one_hot_encode(data)], axis=1)
+    X = pd.concat([X, csv_binary_encode(data)], axis=1)
     # Generate feature and target data
-    X = StandardScaler().fit_transform(X)
+    X = X.to_numpy()
     y = data['mass'].copy()
     #print(f'X.shape:{X.shape}, y.shape:{y.shape}, object_id.shape:{data["object_id"].shape}')
 
@@ -106,6 +109,12 @@ def get_csv_dataloader(X, y, X_object_id):
         X, y, X_object_id, test_size=0.2, random_state=42
     )
 
+    # Standardize the data
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    X_train = scaler.transform(X_train)
+    X_test = scaler.transform(X_test)
+
     # Convert to PyTorch tensors
     X_train, X_test, y_train, y_test, ids_train, ids_test = map(
         torch.tensor, (X_train, X_test, y_train.to_numpy(), y_test.to_numpy(), ids_train.to_numpy(), ids_test.to_numpy())
@@ -121,19 +130,20 @@ def get_csv_dataloader(X, y, X_object_id):
 
     return train_loader, test_loader
 
+
 def objective(trial):
+    # Get the food dataset.
+    X, y, X_object_id = get_csv_data()
+    train_loader, valid_loader = get_csv_dataloader(X, y, X_object_id)
+
     # Generate the model.
     criterion = nn.MSELoss() # mean squared error loss
-    model = define_model(trial).to(DEVICE)
+    model = define_model(trial, X.shape[1]).to(DEVICE)
 
     # Generate the optimizers.
     optimizer_name = trial.suggest_categorical("optimizer", ["Adam", "RMSprop", "SGD"])
     lr = trial.suggest_float("lr", 1e-5, 1e-1, log=True)
     optimizer = getattr(optim, optimizer_name)(model.parameters(), lr=lr)
-
-    # Get the food dataset.
-    X, y, X_object_id = get_csv_data()
-    train_loader, valid_loader = get_csv_dataloader(X, y, X_object_id)
 
     # Training of the model.
     for epoch in range(EPOCHS):

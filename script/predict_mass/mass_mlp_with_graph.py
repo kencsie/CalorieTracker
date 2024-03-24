@@ -280,7 +280,8 @@ def main():
         print(f'epoch: {epoch+1}/{EPOCHS}, train (MSE/RMSE): {np.mean(train_losses):.2f}/{np.sqrt(np.mean(train_losses)):.2f}, valid (MSE/RMSE): {np.mean(valid_losses):.2f}/{np.sqrt(np.mean(valid_losses)):.2f}')
         
     # Plot the loss curves
-    plot_loss_curves(mean_train_losses, mean_valid_losses)
+    plot_loss_curves(mean_train_losses, mean_valid_losses, 'loss_curves_mse.png')
+    plot_loss_curves(np.sqrt(mean_train_losses), np.sqrt(mean_valid_losses), 'loss_curves_rmse.png')
 
     # Model evaluation modifications start here
     model.eval()

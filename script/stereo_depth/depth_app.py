@@ -91,7 +91,7 @@ class App:
         depth_image = np.asanyarray(depth_frame.get_data())
 
         # Apply color map to the depth frame for better visualization
-        depth_cm = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.5), cv2.COLORMAP_JET)
+        depth_cm = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.5), cv2.COLORMAP_VIRIDIS)
 
         # Crop images
         cropped_color, cropped_depth_cm, cropped_depth = crop_images(color_image, depth_cm, depth_image)
@@ -102,15 +102,16 @@ class App:
         # Construct Save Path
         date = datetime.now().strftime("%Y%m%d")  # YYYYMMDD
         time = datetime.now().strftime("%H%M%S")  # HHMMSS
-        os.makedirs(f"./{date}", exist_ok=True)
-        save_path = f"./{date}/{time}"  # "./20240407/030937"
+        os.makedirs(f"./{date}/{time}", exist_ok=True)  # "./20240407/030937"
+        save_path = f"./{date}/{time}"  
 
         # Save images
-        cv2.imwrite(f"{save_path}_rgb.jpg", cropped_color)
-        cv2.imwrite(f"{save_path}_cm.png", cropped_depth_cm)
-        np.save(f"{save_path}_depth_in_meters.npy", depth_in_meters)
+        cv2.imwrite(f"{save_path}/rgb.jpg"               , cropped_color)
+        cv2.imwrite(f"{save_path}/color_map.png"         , cropped_depth_cm)
+        cv2.imwrite(f"{save_path}/depth_no_color_map.png", depth_in_meters)
+        np.save(f"{save_path}/depth_in_meters.npy"       , depth_in_meters)
 
-        print(f"Data saved to: {os.getcwd()}\\{date}")  # For debugging; remove or comment out in production
+        print(f"Data saved to: {os.getcwd()}\\{save_path}")  # For debugging; remove or comment out in production
 
     def update(self):
         # Get frame from camera
@@ -125,7 +126,7 @@ class App:
             depth_image = np.asanyarray(depth_frame.get_data())
 
             # Apply color map to the depth frame for better visualization
-            depth_cm = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.5), cv2.COLORMAP_JET)
+            depth_cm = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.5), cv2.COLORMAP_VIRIDIS)
 
             # Calculate box coordinates
             height, width = depth_image.shape

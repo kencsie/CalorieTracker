@@ -12,8 +12,29 @@ FRAME_WIDTH    = 1280
 FRAME_HEIGHT   = 720
 FRAME_RATE     = 30
 CROP_WIDTH     = 640
-COLOR_BLUE_BGR = (255, 0, 0)
+COLOR_BLUE_RGB = (0, 0, 255)
 
+# List of predefined Colorizer Color Schemes
+# 0 - Jet
+# 1 - Classic
+# 2 - WhiteToBlack
+# 3 - BlackToWhite
+# 4 - Bio
+# 5 - Cold
+# 6 - Warm
+# 7 - Quantized
+# 8 - Pattern
+# 9 - Hue
+COLORIZER_SCHEME_JET            = 0
+COLORIZER_SCHEME_CLASSIC        = 1
+COLORIZER_SCHEME_WHITE_TO_BLACK = 2
+COLORIZER_SCHEME_BLACK_TO_WHITE = 3
+COLORIZER_SCHEME_BIO            = 4
+COLORIZER_SCHEME_COLD           = 5
+COLORIZER_SCHEME_WARM           = 6
+COLORIZER_SCHEME_QUANTIZED      = 7
+COLORIZER_SCHEME_PATTERN        = 8
+COLORIZER_SCHEME_HUE            = 9
 
 def apply_filters(depth_frame):
     """
@@ -29,7 +50,7 @@ def apply_filters(depth_frame):
     # Apply filters
     depth_frame = sp_filter.process(depth_frame)  # Smooth locally
     depth_frame = tp_filter.process(depth_frame)  # Smooth between frames
-    depth_frame = hf_filter.process(depth_frame)  # Fill in gaps gaps
+    depth_frame = hf_filter.process(depth_frame)  # Fill in gaps
 
     return depth_frame
 
@@ -62,6 +83,10 @@ class App:
         self.config.enable_stream(rs.stream.depth, FRAME_WIDTH, FRAME_HEIGHT, rs.format.z16 , FRAME_RATE)
         self.pipeline.start(self.config)
 
+        # Use the provided colorizer object for depth frames
+        self.colorizer = rs.colorizer()
+        self.colorizer.set_option(rs.option.color_scheme, COLORIZER_SCHEME_JET)
+
         # Init the Tkinter Canvas object
         self.canvas = tk.Canvas(window, width=FRAME_WIDTH, height=FRAME_HEIGHT)
         self.canvas.pack()
@@ -91,7 +116,8 @@ class App:
         depth_image = np.asanyarray(depth_frame.get_data())
 
         # Apply color map to the depth frame for better visualization
-        depth_cm = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.5), cv2.COLORMAP_VIRIDIS)
+        depth_cm = np.asanyarray(self.colorizer.colorize(depth_frame).get_data())
+        depth_cm = cv2.cvtColor(depth_cm, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV imwrite()
 
         # Crop images
         cropped_color, cropped_depth_cm, cropped_depth = crop_images(color_image, depth_cm, depth_image)
@@ -102,16 +128,16 @@ class App:
         # Construct Save Path
         date = datetime.now().strftime("%Y%m%d")  # YYYYMMDD
         time = datetime.now().strftime("%H%M%S")  # HHMMSS
-        os.makedirs(f"./{date}/{time}", exist_ok=True)  # "./20240407/030937"
-        save_path = f"./{date}/{time}"  
+        os.makedirs(f"./{date}/{time}", exist_ok=True)
+        save_path = f"./{date}/{time}"  # "./20240407/030937"
 
         # Save images
-        cv2.imwrite(f"{save_path}/rgb.jpg"               , cropped_color)
-        cv2.imwrite(f"{save_path}/color_map.png"         , cropped_depth_cm)
-        cv2.imwrite(f"{save_path}/depth_no_color_map.png", depth_in_meters)
-        np.save(f"{save_path}/depth_in_meters.npy"       , depth_in_meters)
+        cv2.imwrite(f"{save_path}/rgb.jpg"             , cropped_color)
+        cv2.imwrite(f"{save_path}/cm.png"              , cropped_depth_cm)
+        cv2.imwrite(f"{save_path}/depth_no_cm.png"     , depth_in_meters)
+        np.save(f"{save_path}/depth_in_meters.npy"         , depth_in_meters)
 
-        print(f"Data saved to: {os.getcwd()}\\{save_path}")  # For debugging; remove or comment out in production
+        print(f"Data saved to: {os.getcwd()}\\{date}")  # For debugging; remove or comment out in production
 
     def update(self):
         # Get frame from camera
@@ -126,7 +152,7 @@ class App:
             depth_image = np.asanyarray(depth_frame.get_data())
 
             # Apply color map to the depth frame for better visualization
-            depth_cm = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.5), cv2.COLORMAP_VIRIDIS)
+            depth_cm = np.asanyarray(self.colorizer.colorize(depth_frame).get_data())
 
             # Calculate box coordinates
             height, width = depth_image.shape
@@ -135,11 +161,11 @@ class App:
 
             # Draw rectangle on depth color map
             depth_cm = cv2.rectangle(
-                depth_cm, (start_x, start_y), (start_x + CROP_WIDTH, start_y + CROP_WIDTH), COLOR_BLUE_BGR, 2
+                depth_cm, (start_x, start_y), (start_x + CROP_WIDTH, start_y + CROP_WIDTH), COLOR_BLUE_RGB, 2
             )
 
             # Update viewfinder
-            self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(depth_cm, cv2.COLOR_BGR2RGB)))
+            self.photo = ImageTk.PhotoImage(image=Image.fromarray(depth_cm))
             self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
         self.window.after(10, self.update)
 

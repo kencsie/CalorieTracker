@@ -137,7 +137,9 @@ class App:
         cv2.imwrite(f"{save_path}/depth_no_cm.png"     , depth_in_meters)
         np.save(f"{save_path}/depth_in_meters.npy"         , depth_in_meters)
 
-        print(f"Data saved to: {os.getcwd()}\\{date}")  # For debugging; remove or comment out in production
+        print(f"{len(os.listdir(f'./{date}'))} images captured in total")
+
+        # print(f"Data saved to: {os.getcwd()}\\{date}")  # For debugging; remove or comment out in production
 
     def update(self):
         # Get frame from camera

@@ -115,7 +115,7 @@ class App:
         color_image = np.asanyarray(color_frame.get_data())
         depth_image = np.asanyarray(depth_frame.get_data())
 
-        # Apply color map to the depth frame for better visualization
+        # Apply color map to the depth frame for better visualization (Originally in mm)
         depth_cm = np.asanyarray(self.colorizer.colorize(depth_frame).get_data())
         depth_cm = cv2.cvtColor(depth_cm, cv2.COLOR_RGB2BGR)  # Convert to BGR for OpenCV imwrite()
 
@@ -132,10 +132,11 @@ class App:
         save_path = f"./{date}/{time}"  # "./20240407/030937"
 
         # Save images
-        cv2.imwrite(f"{save_path}/rgb.jpg"             , cropped_color)
-        cv2.imwrite(f"{save_path}/cm.png"              , cropped_depth_cm)
-        cv2.imwrite(f"{save_path}/depth_no_cm.png"     , depth_in_meters)
-        np.save(f"{save_path}/depth_in_meters.npy"         , depth_in_meters)
+        cv2.imwrite(f"{save_path}/rgb.jpg"         , cropped_color)
+        cv2.imwrite(f"{save_path}/cm.png"          , cropped_depth_cm)
+        cv2.imwrite(f"{save_path}/depth_no_cm.png" , cropped_depth)
+        np.save(f"{save_path}/depth_in_millimeters.npy", cropped_depth)
+        np.save(f"{save_path}/depth_in_meters.npy"     , depth_in_meters)
 
         print(f"{len(os.listdir(f'./{date}'))} images captured in total")
 

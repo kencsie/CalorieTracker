@@ -106,10 +106,10 @@ DATASETS_CONFIG = {
         "data_path_eval": os.path.join(HOME_DIR, "food"),
         "gt_path_eval": os.path.join(HOME_DIR, "food"),
         "filenames_file_eval": "./train_test_inputs/food_test_files_with_gt.txt",
-        "min_depth_eval": 0.3,
+        "min_depth_eval": 0.2,
         "max_depth_eval": 1,
-        "min_depth_diff": -10,
-        "max_depth_diff": 10,
+        "min_depth_diff": -1,
+        "max_depth_diff": 1,
 
         "do_random_rotate": True,
         "degree": 1.0,

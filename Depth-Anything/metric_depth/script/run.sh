@@ -8,12 +8,12 @@ mkdir ../checkpoints
 wget -P ../checkpoints https://huggingface.co/spaces/LiheYoung/Depth-Anything/resolve/main/checkpoints/depth_anything_vitl14.pth
 
 #Download necessary files(dataset)
-mkdir -p ../data/nyu
-pip install gdown
-apt-get install unzip
-cd ../data/nyu
-gdown --fuzzy https://drive.google.com/file/d/1AysroWpfISmm-yRFGBgFTrLy6FjQwvwP/view?usp=sharing
-unzip sync.zip
+#mkdir -p ../data/nyu
+#pip install gdown
+#apt-get install unzip
+#cd ../data/nyu
+#gdown --fuzzy https://drive.google.com/file/d/1AysroWpfISmm-yRFGBgFTrLy6FjQwvwP/view?usp=sharing
+#unzip sync.zip
 
 #Prevent error message
 apt-get update && apt-get install ffmpeg libsm6 libxext6  -y

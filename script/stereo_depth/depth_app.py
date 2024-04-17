@@ -15,16 +15,6 @@ CROP_WIDTH     = 640
 COLOR_BLUE_RGB = (0, 0, 255)
 
 # List of predefined Colorizer Color Schemes
-# 0 - Jet
-# 1 - Classic
-# 2 - WhiteToBlack
-# 3 - BlackToWhite
-# 4 - Bio
-# 5 - Cold
-# 6 - Warm
-# 7 - Quantized
-# 8 - Pattern
-# 9 - Hue
 COLORIZER_SCHEME_JET            = 0
 COLORIZER_SCHEME_CLASSIC        = 1
 COLORIZER_SCHEME_WHITE_TO_BLACK = 2
@@ -35,6 +25,7 @@ COLORIZER_SCHEME_WARM           = 6
 COLORIZER_SCHEME_QUANTIZED      = 7
 COLORIZER_SCHEME_PATTERN        = 8
 COLORIZER_SCHEME_HUE            = 9
+
 
 def apply_filters(depth_frame):
     """
@@ -132,15 +123,13 @@ class App:
         save_path = f"./{date}/{time}"  # "./20240407/030937"
 
         # Save images
-        cv2.imwrite(f"{save_path}/rgb.jpg"         , cropped_color)
-        cv2.imwrite(f"{save_path}/cm.png"          , cropped_depth_cm)
-        cv2.imwrite(f"{save_path}/depth_no_cm.png" , cropped_depth)
-        np.save(f"{save_path}/depth_in_millimeters.npy", cropped_depth)
-        np.save(f"{save_path}/depth_in_meters.npy"     , depth_in_meters)
+        cv2.imwrite(f"{save_path}/{date}_{time}_rgb.jpg", cropped_color)   # "./20240407/030937/20240407_030937_rgb.jpg"
+        cv2.imwrite(f"{save_path}/cm.png"               , cropped_depth_cm)
+        cv2.imwrite(f"{save_path}/depth_no_cm.png"      , cropped_depth)
+        np.save(f"{save_path}/depth_in_millimeters.npy"     , cropped_depth)
+        np.save(f"{save_path}/depth_in_meters.npy"          , depth_in_meters)
 
         print(f"{len(os.listdir(f'./{date}'))} images captured in total")
-
-        # print(f"Data saved to: {os.getcwd()}\\{date}")  # For debugging; remove or comment out in production
 
     def update(self):
         # Get frame from camera

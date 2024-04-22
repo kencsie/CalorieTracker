@@ -74,6 +74,9 @@ class App:
         self.config.enable_stream(rs.stream.depth, FRAME_WIDTH, FRAME_HEIGHT, rs.format.z16 , FRAME_RATE)
         self.pipeline.start(self.config)
 
+        # Create alignment object (align depth frame to color frame)
+        self.align = rs.align(rs.stream.color)
+
         # Use the provided colorizer object for depth frames
         self.colorizer = rs.colorizer()
         self.colorizer.set_option(rs.option.color_scheme, COLORIZER_SCHEME_JET)
@@ -91,10 +94,13 @@ class App:
         self.update()
 
     def capture_frame(self):
-        # Get frames from camera
+        # Get frames from camera and align depth frames to the color frames
         frames = self.pipeline.wait_for_frames()
-        color_frame = frames.get_color_frame()
-        depth_frame = frames.get_depth_frame()
+        aligned_frames = self.align.process(frames)
+
+        # Get the frames from the individual streams
+        color_frame = aligned_frames.get_color_frame()
+        depth_frame = aligned_frames.get_depth_frame()
 
         if not color_frame or not depth_frame:
             return
@@ -123,6 +129,8 @@ class App:
         save_path = f"./{date}/{time}"  # "./20240407/030937"
 
         # Save images
+        cv2.imwrite(f"{save_path}/full_size_rgb.jpg"    , color_image)
+        cv2.imwrite(f"{save_path}/full_size_depth.png"  , depth_image)
         cv2.imwrite(f"{save_path}/{date}_{time}_rgb.jpg", cropped_color)   # "./20240407/030937/20240407_030937_rgb.jpg"
         cv2.imwrite(f"{save_path}/cm.png"               , cropped_depth_cm)
         cv2.imwrite(f"{save_path}/depth_no_cm.png"      , cropped_depth)

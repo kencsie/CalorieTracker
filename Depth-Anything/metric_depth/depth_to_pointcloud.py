@@ -20,10 +20,10 @@ FL = 715.0873
 FY = 256 * 0.6
 FX = 256 * 0.6
 NYU_DATA = False
-FINAL_HEIGHT = 256
-FINAL_WIDTH = 256
-INPUT_DIR = './my_test/input'
-OUTPUT_DIR = './my_test/output'
+FINAL_HEIGHT = 640
+FINAL_WIDTH = 640
+INPUT_DIR = './data/input/images'
+OUTPUT_DIR = './data/output'
 DATASET = 'nyu' # Lets not pick a fight with the model's dataloader
 
 def process_images(model):
@@ -44,22 +44,11 @@ def process_images(model):
                 pred = pred[-1]
             pred = pred.squeeze().detach().cpu().numpy()
 
-            # Resize color image and depth to final size
-            resized_color_image = color_image.resize((FINAL_WIDTH, FINAL_HEIGHT), Image.LANCZOS)
             resized_pred = Image.fromarray(pred).resize((FINAL_WIDTH, FINAL_HEIGHT), Image.NEAREST)
 
-            focal_length_x, focal_length_y = (FX, FY) if not NYU_DATA else (FL, FL)
-            x, y = np.meshgrid(np.arange(FINAL_WIDTH), np.arange(FINAL_HEIGHT))
-            x = (x - FINAL_WIDTH / 2) / focal_length_x
-            y = (y - FINAL_HEIGHT / 2) / focal_length_y
-            z = np.array(resized_pred)
-            points = np.stack((np.multiply(x, z), np.multiply(y, z), z), axis=-1).reshape(-1, 3)
-            colors = np.array(resized_color_image).reshape(-1, 3) / 255.0
-
-            pcd = o3d.geometry.PointCloud()
-            pcd.points = o3d.utility.Vector3dVector(points)
-            pcd.colors = o3d.utility.Vector3dVector(colors)
-            o3d.io.write_point_cloud(os.path.join(OUTPUT_DIR, os.path.splitext(os.path.basename(image_path))[0] + ".ply"), pcd)
+            # Save the depth map directly into a .npy file
+            npy_file_path = os.path.join(OUTPUT_DIR, os.path.splitext(os.path.basename(image_path))[0] + ".npy")
+            np.save(npy_file_path, resized_pred)
         except Exception as e:
             print(f"Error processing {image_path}: {e}")
 
@@ -73,7 +62,7 @@ def main(model_name, pretrained_resource):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", type=str, default='zoedepth', help="Name of the model to test")
-    parser.add_argument("-p", "--pretrained_resource", type=str, default='local::./checkpoints/depth_anything_metric_depth_indoor.pt', help="Pretrained resource to use for fetching weights.")
+    parser.add_argument("-p", "--pretrained_resource", type=str, default='local::./checkpoints/food_21-Apr_12-06-313eca510dcc_latest.pt', help="Pretrained resource to use for fetching weights.")
 
     args = parser.parse_args()
     main(args.model, args.pretrained_resource)

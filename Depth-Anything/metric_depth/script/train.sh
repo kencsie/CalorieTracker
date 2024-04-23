@@ -1,0 +1,1 @@
+python train_mono.py -m zoedepth -d nyu --pretrained_resource=""

@@ -20,27 +20,10 @@ comment.txt
 
 #Pictures
 **.png
+**/food_dataset
 
 #Depth-Anything
-**/metric_depth/.ipynb_checkpoints/
 **/metric_depth/checkpoints/
 **/metric_depth/data/
 **/metric_depth/depth_anything_finetune/
-**/metric_depth/train_test_inputs/.ipynb_checkpoints/
 **/metric_depth/wandb/
-**/metric_depth/zoedepth/data/__pycache__/
-**/metric_depth/zoedepth/models/.ipynb_checkpoints/
-**/metric_depth/zoedepth/models/__pycache__/
-**/metric_depth/zoedepth/models/base_models/__pycache__/
-**/metric_depth/zoedepth/models/base_models/dpt_dinov2/__pycache__/
-**/metric_depth/zoedepth/models/layers/__pycache__/
-**/metric_depth/zoedepth/models/zoedepth/.ipynb_checkpoints/
-**/metric_depth/zoedepth/models/zoedepth/__pycache__/
-**/metric_depth/zoedepth/trainers/.ipynb_checkpoints/
-**/metric_depth/zoedepth/trainers/__pycache__/
-**/metric_depth/zoedepth/utils/.ipynb_checkpoints/
-**/metric_depth/zoedepth/utils/__pycache__/
-**/metric_depth/zoedepth/utils/easydict/__pycache__/
-**/torchhub/facebookresearch_dinov2_main/__pycache__/
-**/torchhub/facebookresearch_dinov2_main/dinov2/__pycache__/
-**/torchhub/facebookresearch_dinov2_main/dinov2/layers/__pycache__/

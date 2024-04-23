@@ -20,3 +20,10 @@ comment.txt
 
 #Pictures
 **.png
+**/food_dataset
+
+#Depth-Anything
+**/metric_depth/checkpoints/
+**/metric_depth/data/
+**/metric_depth/depth_anything_finetune/
+**/metric_depth/wandb/

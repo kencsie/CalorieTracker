@@ -5,7 +5,7 @@
     <div class="container mt-5">
         <div class="container mt-5">
             <h2>Upload an Image File</h2>
-            <form id="uploadForm" onsubmit="handleUpload(event);">
+            <form id="uploadForm" method="post" action="/upload" onsubmit="handleUpload(event);" enctype="multipart/form-data">
                 <div class="mb-3">
                     <input type="file" class="form-control" name="file" id="file" accept="image/jpeg, image/png, image/gif" required onchange="previewImage();">
                 </div>
@@ -74,7 +74,6 @@
         }
         
         function handleUpload(event) {
-            event.preventDefault(); // Prevent the form from submitting
             var uploadForm = document.getElementById('uploadForm');
             var previewContainer = document.getElementById('previewContainer');
             var spinner = document.getElementById('spinner');
@@ -94,6 +93,7 @@
                 
                 // Show completion message
                 completionMessage.style.display = 'block';
+                return true;
             }, 2000); // Wait for 2 seconds
         }
         </script>

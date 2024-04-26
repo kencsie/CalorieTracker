@@ -27,3 +27,6 @@ comment.txt
 **/metric_depth/data/
 **/metric_depth/depth_anything_finetune/
 **/metric_depth/wandb/
+
+#Web development
+**/website/data

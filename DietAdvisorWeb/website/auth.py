@@ -74,6 +74,7 @@ def login():
 
 @auth.route('/logout')
 def logout():
+    #Remove session
     session.pop('user_id', None)
     session.pop('username', None)
     return redirect(url_for('views.home'))

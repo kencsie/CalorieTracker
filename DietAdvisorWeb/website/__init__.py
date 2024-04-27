@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_session import Session
 import os
 
 UPLOAD_FOLDER = './website/data/pics'
@@ -14,6 +15,11 @@ def create_app():
 
     # Configuration for MongoDB
     app.config["MONGO_URI"] = "mongodb://192.168.50.50:40019/DietAdvisorWeb"
+
+    # Configure session to use filesystem (instead of signed cookies)
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_FILE_DIR'] = './website/data/sessions'
+    Session(app)
 
     from .views import views
     from .auth import auth

@@ -12,6 +12,9 @@ def create_app():
     app.config['SECRET_KEY'] = 'secret'
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+    # Configuration for MongoDB
+    app.config["MONGO_URI"] = "mongodb://192.168.50.50:40019/DietAdvisorWeb"
+
     from .views import views
     from .auth import auth
     from .upload import upload

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="mt-5">
+        <h1>User Profile</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><strong>Name:</strong>{{ user.Username }}</h5>
+                <p class="card-text"><strong>Age:</strong> {{ user.age }}</p>
+                <p class="card-text"><strong>Height:</strong> {{ user.height }} cm</p>
+                <p class="card-text"><strong>Weight:</strong> {{ user.weight }} kg</p>
+                <p class="card-text"><strong>BMR:</strong> {{ user.BMR }} kcal/day</p>
+                <p class="card-text"><strong>TDEE:</strong> {{ user.TDEE }} kcal/day</p>
+            </div>
+        </div>
+        <h2 class="mt-4">Intake History</h2>
+        {% for day in user.intake_history %}
+            <div class="card mt-3 mb-3">
+                <div class="card-header">
+                    Date: {{ day.date }}
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for intake in day.intakes %}
+                        {% for key, value in intake.items() %}
+                            <li class="list-group-item">{{ key }}: {{ value }} grams</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

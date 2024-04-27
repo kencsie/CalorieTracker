@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, current_app
+from flask_pymongo import PyMongo
 
 views = Blueprint('views', __name__)
 
@@ -16,3 +17,13 @@ def tracking():
 @views.route('/about')
 def about():
     return "<h1>About</h1>"
+
+# Profile route
+@views.route('/profile')
+def profile(username="Foo"):
+    mongo = PyMongo(current_app)
+    user_collection = mongo.db.User
+    user_data = user_collection.find_one({"Username": username})  # Fetch one document from the collection
+    if user_data:
+        user_data.pop('_id', None)  # Remove the '_id' since it's not JSON serializable
+    return render_template('profile.html', user=user_data)

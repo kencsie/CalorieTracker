@@ -14,7 +14,7 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
     # Configuration for MongoDB
-    app.config["MONGO_URI"] = "mongodb://192.168.50.50:40019/DietAdvisorWeb"
+    app.config["MONGO_URI"] = "mongodb+srv://calorie:calorie@cluster0.mv5fa3v.mongodb.net/DietAdvisorWeb"
 
     # Configure session to use filesystem (instead of signed cookies)
     app.config['SESSION_TYPE'] = 'filesystem'

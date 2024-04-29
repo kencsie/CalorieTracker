@@ -31,4 +31,5 @@ comment.txt
 #Web development
 **/website/data/sessions/*
 **/website/data/pics/*
+**/website/data/depth_maps/*
 **/website/data/models/yolo.pt

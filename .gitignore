@@ -29,4 +29,6 @@ comment.txt
 **/metric_depth/wandb/
 
 #Web development
-**/website/data
+**/website/data/sessions/*
+**/website/data/pics/*
+**/website/data/models/yolo.pt

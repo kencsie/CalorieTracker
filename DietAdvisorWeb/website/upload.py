@@ -8,7 +8,7 @@ upload = Blueprint('upload', __name__)
 @upload.route('/upload', methods=['POST'])
 def upload_file():
     def yolo_object_detection(image_path, output_path):
-        model = torch.hub.load('ultralytics/yolov5', 'custom', path='./website/data/model/yolo.pt')
+        model = torch.hub.load('ultralytics/yolov5', 'custom', path='./website/data/models/yolo.pt')
         model.eval()
         results = model(image_path)
         results.save(save_dir=output_path, exist_ok=True)

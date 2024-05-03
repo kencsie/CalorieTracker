@@ -96,26 +96,27 @@ DATASETS_CONFIG = {
     "nyu": {
         "dataset": "nyu",
         "avoid_boundary": False,
-        "min_depth": 0.2,   # originally 0.1
-        "max_depth": 1,
+        "min_depth": 1e-3,   # originally 0.1
+        "max_depth": 10,
         "data_path": os.path.join(HOME_DIR),
         "gt_path": os.path.join(HOME_DIR),
-        "filenames_file": "./train_test_inputs/food_train_files_with_gt.txt",
-        "input_height": 640,
+        "filenames_file": "./train_test_inputs/nutrition5k_train_files_with_gt.txt",
+        "input_height": 480,
         "input_width": 640,
         "data_path_eval": os.path.join(HOME_DIR),
         "gt_path_eval": os.path.join(HOME_DIR),
-        "filenames_file_eval": "./train_test_inputs/food_test_files_with_gt.txt",
-        "min_depth_eval": 0.2,
-        "max_depth_eval": 1,
-        "min_depth_diff": -1,
-        "max_depth_diff": 1,
+        "filenames_file_eval": "./train_test_inputs/nutrition5k_test_files_with_gt.txt",
+        "min_depth_eval": 1e-3,
+        "max_depth_eval": 10,
+        "min_depth_diff": -10,
+        "max_depth_diff": 10,
+        #"checkpoint": os.path.join(os.path.expanduser("./checkpoints"), "depth_anything_metric_depth_indoor.pt"),
 
         "do_random_rotate": True,
         "degree": 1.0,
         "do_kb_crop": False,
         "garg_crop": False,
-        "eigen_crop": True
+        "eigen_crop": False
     },
     "ibims": {
         "dataset": "ibims",

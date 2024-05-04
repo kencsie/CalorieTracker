@@ -3,6 +3,9 @@ from flask_pymongo import PyMongo
 from datetime import datetime, timedelta
 from urllib.parse import quote, unquote
 import json
+import os
+from dotenv import load_dotenv
+import zukiPy
 
 views = Blueprint('views', __name__)
 
@@ -122,3 +125,23 @@ def profile():
     if user_data:
         user_data.pop('_id', None)  # Remove the '_id' since it's not JSON serializable
     return render_template('profile.html', user=user_data)
+
+#Recommend route
+@views.route('/recommend', methods=['GET', 'POST'])
+async def index():
+    load_dotenv()
+    api_key = os.getenv("OPENAI_API_KEY")
+    zukiAI = zukiPy.zukiCall(api_key, "gpt-4")
+
+    if request.method == 'POST':
+        prompt = request.form['prompt']
+        if prompt:
+            # If you want to experience it from zukijourney
+            #gpt_response = await zukiAI.zuki_chat.sendMessage(session['username'], prompt)
+            #print("Chat Response:", gpt_response)
+            with open('./website/static/user_response.txt', 'r', encoding='utf-8') as file:
+                gpt_response = file.read()
+            return render_template('recommend.html', prompt=prompt, response=gpt_response)
+    
+
+    return render_template('recommend.html', prompt='', response='')

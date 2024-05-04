@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="text-center mb-4">GPT-powered Recommend System</h1>
+            <form method="post">
+                <div class="form-group">
+                    <textarea class="form-control" name="prompt" rows="4" placeholder="Enter your prompt here...">{{ prompt }}</textarea>
+                </div>
+                <button type="submit" class="mt-3 btn btn-primary btn-block">Generate</button>
+            </form>
+            {% if response %}
+            <div class="mt-4">
+                <h2>Response:</h2>
+                <div class="bg-light p-3" id="markdown-content"></div>
+                <script>
+                    document.getElementById('markdown-content').innerHTML = marked.parse(`{{ response | safe }}`);
+                </script>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

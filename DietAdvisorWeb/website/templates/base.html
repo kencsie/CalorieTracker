@@ -8,6 +8,7 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     <title>{% block title %}Diet Advisor{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body>
@@ -25,6 +26,7 @@
                     <a class="nav-item nav-link" href="/">Home</a>
                     <a class="nav-item nav-link" href="/tracking">Tracking</a>
                     <a class="nav-item nav-link" href="/about">About</a>
+                    <a class="nav-item nav-link" href="/recommend">Recommending</a>
                 </div>
                 <!-- Right-aligned links -->
                 <div class="navbar-nav ms-auto">

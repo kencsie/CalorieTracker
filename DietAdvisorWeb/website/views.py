@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template, current_app, session, jsonify
+from flask import Blueprint, render_template, current_app, session, jsonify, request
 from flask_pymongo import PyMongo
 from datetime import datetime, timedelta
+from urllib.parse import quote, unquote
+import json
 
 views = Blueprint('views', __name__)
 
@@ -70,6 +72,46 @@ def tracking():
 @views.route('/about')
 def about():
     return "<h1>About</h1>"
+
+# Results Route
+@views.route('/results')
+def results():
+    # Define nutrient dictionary
+    nutrient_dict = {
+        "broccoli": {
+            "serving_size" : 120,    # grams
+            "energy"       : 31.4,   # kcal
+            "protein"      : 3.6,    # grams
+            "fat"          : 0.2,    # "
+            "carbohydrates": 5.5,    # "
+            "fiber"        : 3.6     # "
+        },
+        "pineapple": {
+            "serving_size" : 100,
+            "energy"       : 48,
+            "protein"      : 45.36,
+            "fat"          : 10.08,
+            "carbohydrates": 1060.92,
+            "fiber"        : 117.6
+        },
+        "popcorn_chicken": {
+            "serving_size" : 100,
+            "energy"       : 245,
+            "protein"      : 17.0,
+            "fat"          : 13.0,
+            "carbohydrates": 15.0,
+            "fiber"        : 0.0    # May need to change
+        }
+    }
+
+    # Retrieve the encoded class names from the query paratemeters
+    encoded_classes    = request.args.get('detected_classes', '')
+    serialized_classes = unquote(encoded_classes)
+    detected_classes   = json.loads(serialized_classes) if serialized_classes else []
+    detected_classes   = [name for name in detected_classes if name != 'coin']  # Omit the coin from the detected classes
+
+    return render_template('results.html', nutrient_dict=nutrient_dict, name_list=detected_classes)
+
 
 # Profile route
 @views.route('/profile')

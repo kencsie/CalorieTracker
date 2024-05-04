@@ -73,7 +73,11 @@
                         intersect: false,
                         callbacks: {
                             label: function(tooltipItems) {
-                                return tooltipItems.dataset.label + ': ' + tooltipItems.parsed.y + ' grams';
+                                let unit = "grams";
+                                if (tooltipItems.dataset.label === 'Calories') {
+                                    unit = "kcal"; // Use 'kcal' for calories
+                                }
+                                return tooltipItems.dataset.label + ': ' + tooltipItems.parsed.y + ' ' + unit;
                             }
                         }
                     }

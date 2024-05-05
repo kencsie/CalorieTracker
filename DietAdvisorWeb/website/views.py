@@ -108,7 +108,7 @@ def results():
     encoded_classes    = request.args.get('detected_classes', '')
     serialized_classes = unquote(encoded_classes)
     detected_classes   = json.loads(serialized_classes) if serialized_classes else []
-    detected_classes   = [name for name in detected_classes if name != 'coin']  # Omit the coin from the detected classes
+    # detected_classes   = [name for name in detected_classes if name != 'coin']  # Omit the coin from the detected classes
 
     return render_template('results.html', nutrient_dict=nutrient_dict, name_list=detected_classes)
 

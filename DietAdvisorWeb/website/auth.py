@@ -7,17 +7,18 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
-    def get_user_profile(gender, age, weight, height, physical_activity):
+    def get_user_profile(gender, age, weight, height, physical_activity, weight_option, weight_option_amonut):
         age = float(age)
         weight = float(weight)
         height = float(height)
         physical_activity = float(physical_activity)
+        weight_option_amonut = float(weight_option_amonut)
 
         BMR_offset = 5 if gender == 'm' else -161
         BMR = (10 * weight) + (6.25 * height) - (5 * age) + BMR_offset
         TDEE = BMR * physical_activity
 
-        return {'gender':gender, 'age':age, 'weight':weight, 'height':height, 'physical_activity_multiplier':physical_activity, 'BMR':BMR, 'TDEE':TDEE}
+        return {'gender':gender, 'age':age, 'weight':weight, 'height':height, 'physical_activity_multiplier':physical_activity, 'weight_option':weight_option, 'weight_option_amonut':weight_option_amonut, 'BMR':BMR, 'TDEE':TDEE}
 
     mongo = PyMongo(current_app)
     
@@ -29,6 +30,8 @@ def register():
         weight = request.form.get('weight')
         height = request.form.get('height')
         physical_activity = request.form.get('physical_activity')
+        weight_option = request.form.get('weight_option')
+        weight_option_amount = request.form.get('weight_option_amount')
         user_collection = mongo.db.User
 
         # Check if user exists
@@ -41,7 +44,7 @@ def register():
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         
         #Get user profile
-        user_profile = get_user_profile(gender, age, weight, height, physical_activity)
+        user_profile = get_user_profile(gender, age, weight, height, physical_activity, weight_option, weight_option_amount)
         user_data = {'Username': username, 'Password': hashed_password}
         user_data.update(user_profile)
         

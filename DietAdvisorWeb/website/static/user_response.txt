@@ -1,0 +1,35 @@
+Given Ken's dietary requirements and the goal to gain weight by adjusting his daily calorie intake by 300 calories, his target daily calorie intake should be around 2607.56 calories. Considering he has consumed 700.98 calories so far, he needs an additional 1906.58 calories to meet his target. To ensure a balanced meal plan for dinner that doesn't exceed his Total Daily Energy Expenditure (TDEE) plus the weight gain goal, we'll focus on including a variety of food items from the list provided that offer a good balance of proteins, fats, and carbohydrates.
+
+Ken's protein intake is relatively low compared to his overall needs, especially considering his activity level and weight management goals. An average male of his age and activity level should aim for at least 1.2 to 2 grams of protein per kg body weight per day for muscle maintenance and growth, which translates to approximately 62.4 - 104 grams of protein daily. His fat and carbohydrate intake also need to be balanced to support his energy levels and physical health.
+
+### Dinner Plan:
+
+#### Main Course:
+- **Kabayaki Sea Bream Fillet**: High in protein and omega-3 fatty acids. One fillet (around 200g) can provide roughly 400 calories, 40g of protein, and 24g of fat.
+- **Grilled Pork** (100g): Offers about 297 calories, 25.7g of protein, and 20.8g of fat.
+- **Rice** (1 cup cooked, approximately 158g): Provides about 205 calories, 4.25g of protein, and 44.5g of carbohydrates.
+
+#### Side Dishes:
+- **Mustard Greens** (1 cup cooked): Contains about 21 calories, 3g of protein, 0.2g of fat, and 4g of carbohydrates.
+- **Pumpkin** (1 cup cooked, mashed): Adds around 49 calories, 1.76g protein, 0.17g fat, and 12g carbohydrates.
+- **Cucumber** (sliced, 1 cup): Very low in calories but good for hydration and fiber; approximately 16 calories, 0.8g protein, 0.2g fat, and 3.8g carbohydrates.
+
+#### Dessert/Snack:
+- **Apple** (sliced, 1 medium): Approximately 95 calories, 0.5g protein, 0.3g fat, and 25g carbohydrates.
+- **Guava** (sliced, 1 cup): Vitamin-rich, about 112 calories, 4.2g protein, 1.6g fat, and 23.6g carbohydrates.
+
+### Nutritional Overview (Approximate):
+- **Calories**: ≈1195 calories
+- **Proteins**: ≈79.45g
+- **Fats**: ≈47.27g
+- **Carbohydrates**: ≈113.1g
+
+### Remaining Intake for the Day:
+Considering the total intake including lunch and this dinner plan:
+- **Calories needed**: Approx. 711.58 calories (to reach the goal with a bit of flexibility)
+- **Proteins needed**: Aim for at least an additional 25g to reach a good daily intake.
+- **Fats and Carbohydrates**: Additional intake should be balanced based on remaining calories.
+
+Ken could consider a high-protein snack or shake later in the evening if he finds himself short on protein or calories. Options like firm tofu, egg tofu, or even a soy egg can help reach the protein goal. Additionally, incorporating a serving of creamy tofu (without sauce) as part of the evening snack can offer both protein and fat without adding too much in terms of carbohydrates.
+
+This plan focuses on providing a balanced approach to meet Ken's nutritional needs by the end of the day while supporting his weight management goals. It's important to adjust portions based on actual package labels or more precise measurements as needed.

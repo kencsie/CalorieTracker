@@ -9,9 +9,11 @@ def create_app():
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
 
+    # app = Flask(__name__, static_folder=UPLOAD_FOLDER, static_url_path='/static')
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'secret'
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    # app = Flask(__name__, static_folder=UPLOAD_FOLDER, static_url_path='/static')
 
     # Configuration for MongoDB
     app.config["MONGO_URI"] = "mongodb+srv://calorie:calorie@cluster0.mv5fa3v.mongodb.net/DietAdvisorWeb"

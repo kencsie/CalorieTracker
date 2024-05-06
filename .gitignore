@@ -36,3 +36,4 @@ comment.txt
 **/*.pkl
 **/*.pth
 **/runs
+**/static/results/

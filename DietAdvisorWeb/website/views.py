@@ -130,6 +130,9 @@ def results():
     encoded_classes = request.args.get('detected_classes', '')
     serialized_classes = unquote(encoded_classes)
     results = json.loads(serialized_classes) if serialized_classes else []
+
+    image_name = request.args.get('image_name', '')
+    # image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], 'results', image_name)
     
     enriched_results = []
     total_mass = total_energy = total_protein = total_fat = total_carbohydrates = 0
@@ -169,7 +172,7 @@ def results():
         'total_carbs': "{:.2f}".format(total_carbohydrates)
     }
 
-    return render_template('results.html', results=enriched_results, **formatted_totals)
+    return render_template('results.html', results=enriched_results, **formatted_totals, image_name=image_name)
 
 # Profile route
 @views.route('/profile')

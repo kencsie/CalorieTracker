@@ -15,14 +15,14 @@ from segment_anything import sam_model_registry, SamPredictor
 
 upload = Blueprint('upload', __name__)
 
-# Global model loading
-yolo_model = torch.hub.load('ultralytics/yolov5', 'custom', path='./website/data/models/yolo.pt')
-yolo_model.eval()
+# # Global model loading
+# yolo_model = torch.hub.load('ultralytics/yolov5', 'custom', path='./website/data/models/yolo.pt')
+# yolo_model.eval()
 
-sam_model_details = sam_model_registry["vit_h"]
-sam_model = sam_model_details(checkpoint="./website/data/models/sam_vit_h_4b8939.pth").to(torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+# sam_model_details = sam_model_registry["vit_h"]
+# sam_model = sam_model_details(checkpoint="./website/data/models/sam_vit_h_4b8939.pth").to(torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
-regression_model = joblib.load('./website/data/models/regression_model.pkl')
+# regression_model = joblib.load('./website/data/models/regression_model.pkl')
 
 @upload.route('/upload', methods=['POST'])
 def upload_file():
@@ -32,8 +32,8 @@ def upload_file():
             img.save(image_path)
 
     def yolo_object_detection(image_path, output_path):
-        # yolo_model = torch.hub.load('ultralytics/yolov5', 'custom', path='./website/data/models/yolo.pt')
-        # yolo_model.eval()
+        yolo_model = torch.hub.load('ultralytics/yolov5', 'custom', path='./website/data/models/yolo.pt')
+        yolo_model.eval()
         results = yolo_model(image_path)
         detected_objects = []
 
@@ -50,16 +50,18 @@ def upload_file():
                 'bbox': [int(row['xmin']), int(row['ymin']), int(row['xmax']), int(row['ymax'])]
             }
             detected_objects.append(detected_object)
+
+        # filename = os.path.basename(image_path)
         results.save(save_dir=output_path, exist_ok=True)
 
         # return detected_classes
         return detected_objects
 
     def perform_segmentation(image_path, bounding_boxes, real_coin_area):
-        # CHECKPOINT_PATH = "./website/data/models/sam_vit_h_4b8939.pth"
-        # MODEL_TYPE = "vit_h"
-        # DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        # sam_model = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
+        CHECKPOINT_PATH = "./website/data/models/sam_vit_h_4b8939.pth"
+        MODEL_TYPE = "vit_h"
+        DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        sam_model = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
         mask_predictor = SamPredictor(sam_model)
 
         # Load and prepare the image
@@ -90,11 +92,15 @@ def upload_file():
         return details
 
     def estimate_depth(image_path):
+        torch.cuda.empty_cache()
         depth_map_directory = './website/data/depth_maps'
         depth_map_path = os.path.join(depth_map_directory, os.path.splitext(os.path.basename(image_path))[0] + '.npy')
         os.makedirs(depth_map_directory, exist_ok=True)
+
+        # Change to the script's directory
         c = os.getcwd()
         os.chdir('./website/data/models/Depth-Anything/metric_depth')
+
         try:
             result = subprocess.run(
                 ['python', './depth_to_pointcloud.py'],
@@ -103,8 +109,10 @@ def upload_file():
         except subprocess.CalledProcessError as e:
             print("Error:", e.stderr)
             raise e
+        finally:
+            # Change back to the original directory
+            os.chdir(c) 
 
-        os.chdir(c)
         return depth_map_path
 
     def coin_centroid(mask):
@@ -115,7 +123,7 @@ def upload_file():
         return int(x_centroid), int(y_centroid)
 
     def calculate_volume_and_mass(segmentation_details, depth_map_path):
-        # regression_model = joblib.load('./website/data/models/regression_model.pkl')
+        regression_model = joblib.load('./website/data/models/regression_model.pkl')
         depth_map = np.load(depth_map_path)
         depth_map *= 100
 
@@ -162,7 +170,7 @@ def upload_file():
 
 
     # Define the path to save processed images
-    output_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'results')
+    output_folder = os.path.join(current_app.root_path, 'static', 'results')
     os.makedirs(output_folder, exist_ok=True)
 
     # Collect file object
@@ -199,4 +207,7 @@ def upload_file():
     # Encode data to be sent through query parameters
     encoded_classes = quote(serialized_classes)
 
-    return redirect(url_for('views.results', detected_classes=encoded_classes))
+    results_image_path = os.path.join(output_folder,  os.path.splitext(os.path.basename(file_path))[0] + '.jpg')
+    
+
+    return redirect(url_for('views.results', detected_classes=encoded_classes, image_name=os.path.basename(results_image_path)))

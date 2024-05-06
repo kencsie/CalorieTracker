@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container">
+    <center>
+        <h1>Detection Results</h1>
+        <img src="{{ url_for('static', filename='results/' + image_name) }}" alt="Detection Result" class="img-fluid" style="max-width: 400px; height: auto;">
+    </center>
+    
+</div>
 <div class="container mt-4">
     <h2>Nutrition Results</h2>
     <div class="table-responsive">

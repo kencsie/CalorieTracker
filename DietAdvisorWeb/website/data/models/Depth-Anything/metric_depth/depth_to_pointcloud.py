@@ -30,7 +30,7 @@ def process_images(model):
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
 
-    image_paths = glob.glob(os.path.join(INPUT_DIR, '*.png')) + glob.glob(os.path.join(INPUT_DIR, '*.jpg'))
+    image_paths = glob.glob(os.path.join(INPUT_DIR, '*.png')) + glob.glob(os.path.join(INPUT_DIR, '*.jpg')) + glob.glob(os.path.join(INPUT_DIR, '*.jpeg'))
     for image_path in tqdm(image_paths, desc="Processing Images"):
         try:
             color_image = Image.open(image_path).convert('RGB')
@@ -43,6 +43,7 @@ def process_images(model):
             elif isinstance(pred, (list, tuple)):
                 pred = pred[-1]
             pred = pred.squeeze().detach().cpu().numpy()
+            
 
             resized_pred = Image.fromarray(pred).resize((FINAL_WIDTH, FINAL_HEIGHT), Image.NEAREST)
 
@@ -62,7 +63,6 @@ def main(model_name, pretrained_resource):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", type=str, default='zoedepth', help="Name of the model to test")
-    parser.add_argument("-p", "--pretrained_resource", type=str, default='local::./checkpoints/ZoeDepthv1_28-Apr_17-05-bb098d29daf9_latest.pt', help="Pretrained resource to use for fetching weights.")
-
+    parser.add_argument("-p", "--pretrained_resource", type=str, default='local::./checkpoints/nutrition5k_03-May_12-04-b56f6cfdfe15_latest.pt', help="Pretrained resource to use for fetching weights.")
     args = parser.parse_args()
     main(args.model, args.pretrained_resource)

@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template, current_app, session, jsonify, request
+from flask import Blueprint, render_template, current_app, session, jsonify, request, redirect, url_for
 from flask_pymongo import PyMongo
 from datetime import datetime, timedelta
 from urllib.parse import quote, unquote
 import json
 import os
 from dotenv import load_dotenv
-import zukiPy
+# import zukiPy
 
 views = Blueprint('views', __name__)
 
@@ -60,7 +60,7 @@ def tracking():
                 for nutrient_info in entry['intakes']:
                     for nutrient, amount in nutrient_info.items():
                         # Convert amount to integer, and accumulate the totals
-                        daily_totals[entry_date][nutrient] += int(amount)
+                        daily_totals[entry_date][nutrient] += float(amount)
 
         # Now, populate the tracking_data with the totals for each nutrient
         for i, date in enumerate(tracking_data['dates']):
@@ -71,6 +71,49 @@ def tracking():
 
     return render_template('chart.html', data=tracking_data)
 
+@views.route('/add_to_tracking', methods=['POST'])
+def add_to_tracking():
+    if 'username' not in session:
+        return redirect(url_for('home'))
+
+    mongo = PyMongo(current_app)
+    user_collection = mongo.db.User
+    user_data = user_collection.find_one({"Username": session['username']})
+
+    if not user_data:
+        return "User data not found", 404
+
+    today = datetime.now().strftime('%Y%m%d')
+    total_energy = float(request.form.get('total_energy', 0))
+    total_carbs = float(request.form.get('total_carbs', 0))
+    total_fat = float(request.form.get('total_fat', 0))
+    total_protein = float(request.form.get('total_protein', 0))
+
+    entry_found = False
+    if 'intake_history' not in user_data:
+        user_data['intake_history'] = []
+    for entry in user_data['intake_history']:
+        if entry['date'] == today:
+            entry['intakes'][0]['Calorie'] = "{:.2f}".format(float(entry['intakes'][0].get('Calorie', '0')) + total_energy)
+            entry['intakes'][1]['Carb'] = "{:.2f}".format(float(entry['intakes'][1].get('Carb', '0')) + total_carbs)
+            entry['intakes'][2]['Fat'] = "{:.2f}".format(float(entry['intakes'][2].get('Fat', '0')) + total_fat)
+            entry['intakes'][3]['Protein'] = "{:.2f}".format(float(entry['intakes'][3].get('Protein', '0')) + total_protein)
+            entry_found = True
+            break
+    if not entry_found:
+        user_data['intake_history'].append({
+            'date': today,
+            'intakes': [
+                {'Calorie': "{:.2f}".format(total_energy)},
+                {'Carb': "{:.2f}".format(total_carbs)},
+                {'Fat': "{:.2f}".format(total_fat)},
+                {'Protein': "{:.2f}".format(total_protein)}
+            ]
+        })
+
+    user_collection.update_one({"Username": session['username']}, {"$set": user_data})
+    return redirect(url_for('views.tracking'))
+
 # About route
 @views.route('/about')
 def about():
@@ -79,42 +122,54 @@ def about():
 # Results Route
 @views.route('/results')
 def results():
-    # Define nutrient dictionary
-    nutrient_dict = {
-        "broccoli": {
-            "serving_size" : 120,    # grams
-            "energy"       : 31.4,   # kcal
-            "protein"      : 3.6,    # grams
-            "fat"          : 0.2,    # "
-            "carbohydrates": 5.5,    # "
-            "fiber"        : 3.6     # "
-        },
-        "pineapple": {
-            "serving_size" : 100,
-            "energy"       : 48,
-            "protein"      : 45.36,
-            "fat"          : 10.08,
-            "carbohydrates": 1060.92,
-            "fiber"        : 117.6
-        },
-        "popcorn_chicken": {
-            "serving_size" : 100,
-            "energy"       : 245,
-            "protein"      : 17.0,
-            "fat"          : 13.0,
-            "carbohydrates": 15.0,
-            "fiber"        : 0.0    # May need to change
-        }
+    def load_nutrient_data():
+        with open('./website/data/nutrient_data.json', 'r') as f:
+            nutrient_dict = json.load(f)
+        return nutrient_dict
+    nutrient_dict = load_nutrient_data()
+    encoded_classes = request.args.get('detected_classes', '')
+    serialized_classes = unquote(encoded_classes)
+    results = json.loads(serialized_classes) if serialized_classes else []
+    
+    enriched_results = []
+    total_mass = total_energy = total_protein = total_fat = total_carbohydrates = 0
+    for item in results:
+        food_name = item['name']
+        mass = item['mass']
+        if food_name in nutrient_dict:
+            nutrients = nutrient_dict[food_name]
+            factor = mass / 100.0
+            energy = nutrients['energy'] * factor
+            protein = nutrients['protein'] * factor
+            fat = nutrients['fat'] * factor
+            carbohydrates = nutrients['carbohydrates'] * factor
+            
+            total_mass += mass
+            total_energy += energy
+            total_protein += protein
+            total_fat += fat
+            total_carbohydrates += carbohydrates
+            
+            enriched_item = {
+                "name": food_name,
+                "mass": "{:.2f}".format(mass),
+                "energy": "{:.2f}".format(nutrients['energy'] * factor),
+                "fat": "{:.2f}".format(nutrients['fat'] * factor),
+                "carbohydrates": "{:.2f}".format(nutrients['carbohydrates'] * factor),
+                "protein": "{:.2f}".format(nutrients['protein'] * factor)
+            }
+            enriched_results.append(enriched_item)
+
+    # Format totals to two decimal places
+    formatted_totals = {
+        'total_mass': "{:.2f}".format(total_mass),
+        'total_energy': "{:.2f}".format(total_energy),
+        'total_protein': "{:.2f}".format(total_protein),
+        'total_fat': "{:.2f}".format(total_fat),
+        'total_carbs': "{:.2f}".format(total_carbohydrates)
     }
 
-    # Retrieve the encoded class names from the query paratemeters
-    encoded_classes    = request.args.get('detected_classes', '')
-    serialized_classes = unquote(encoded_classes)
-    detected_classes   = json.loads(serialized_classes) if serialized_classes else []
-    # detected_classes   = [name for name in detected_classes if name != 'coin']  # Omit the coin from the detected classes
-
-    return render_template('results.html', nutrient_dict=nutrient_dict, name_list=detected_classes)
-
+    return render_template('results.html', results=enriched_results, **formatted_totals)
 
 # Profile route
 @views.route('/profile')
@@ -126,22 +181,22 @@ def profile():
         user_data.pop('_id', None)  # Remove the '_id' since it's not JSON serializable
     return render_template('profile.html', user=user_data)
 
-#Recommend route
-@views.route('/recommend', methods=['GET', 'POST'])
-async def index():
-    load_dotenv()
-    api_key = os.getenv("OPENAI_API_KEY")
-    zukiAI = zukiPy.zukiCall(api_key, "gpt-4")
+# #Recommend route
+# @views.route('/recommend', methods=['GET', 'POST'])
+# async def index():
+#     load_dotenv()
+#     api_key = os.getenv("OPENAI_API_KEY")
+#     zukiAI = zukiPy.zukiCall(api_key, "gpt-4")
 
-    if request.method == 'POST':
-        prompt = request.form['prompt']
-        if prompt:
-            # If you want to experience it from zukijourney
-            #gpt_response = await zukiAI.zuki_chat.sendMessage(session['username'], prompt)
-            #print("Chat Response:", gpt_response)
-            with open('./website/static/user_response.txt', 'r', encoding='utf-8') as file:
-                gpt_response = file.read()
-            return render_template('recommend.html', prompt=prompt, response=gpt_response)
+#     if request.method == 'POST':
+#         prompt = request.form['prompt']
+#         if prompt:
+#             # If you want to experience it from zukijourney
+#             gpt_response = await zukiAI.zuki_chat.sendMessage(session['username'], prompt)
+#             print("Chat Response:", gpt_response)
+#             #with open('./website/static/user_response.txt', 'r', encoding='utf-8') as file:
+#             #    gpt_response = file.read()
+#             return render_template('recommend.html', prompt=prompt, response=gpt_response)
     
 
-    return render_template('recommend.html', prompt='', response='')
+#     return render_template('recommend.html', prompt='', response='')

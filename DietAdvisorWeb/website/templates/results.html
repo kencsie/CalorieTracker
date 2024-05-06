@@ -1,117 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<!-- Carousel wrapper -->
-<div id="imageCarousel" class="carousel slide pt-5" data-bs-ride="carousel">
-    <!-- Indicators -->
-    <ol class="carousel-indicators list-unstyled m-0">
-      <li data-bs-target="#imageCarousel" data-bs-slide-to="0" class="active"></li>
-      <li data-bs-target="#imageCarousel" data-bs-slide-to="1"></li>
-      <li data-bs-target="#imageCarousel" data-bs-slide-to="2"></li>
-    </ol>
-  
-    <!-- Carousel inner -->
-    <div class="carousel-inner" style="width: 500px; margin: auto;">
-        <div class="carousel-item active">
-          <img class="d-block w-100" src="../static/broccoli_original_test.jpg" alt="Original Image" style="width: 500px; height: 500px; object-fit: contain;">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>Original</h5>
-        </div>
-        </div>
-        <div class="carousel-item">
-          <img class="d-block w-100" src="../static/broccoli_id_result.jpg" alt="Identification Result" style="width: 500px; height: 500px; object-fit: contain;">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>YOLO Result</h5>
-        </div>
-        </div>
-        <div class="carousel-item">
-          <img class="d-block w-100" src="../static/estimated_depth_map.png" alt="Estimated Depth Map" style="width: 500px; height: 500px; object-fit: contain;">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>Depth Map</h5>
-        </div>
-        </div>
-     </div>
-      
-    <!-- Controls -->
-    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-bs-slide="prev" style="filter: invert(100%);">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    </a>
-    <a class="carousel-control-next" href="#imageCarousel" role="button" data-bs-slide="next" style="filter: invert(100%);">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    </a>
-</div>
-
-<!-- Toggle Carousel Visibilty Button -->
-<div class="mt-3">
-    <button class="btn btn-primary mb-3" type="button" id="toggleCarousel">Hide Images</button>
-</div>
-
-<form method="post" action="/recommend">
-    <input type="hidden" name="prompt" value="Enter your prompt here...">
-    <button type="submit" class="mt-3 btn btn-primary btn-block">Meal recommendation</button>
-</form>
-
-
-<!-- Nutrtion Facts Table -->
 <div class="container mt-4">
-    <!-- Generate a table for each detected food class -->
-    {% for name in name_list %} 
-        <div class="mt-2">
-            <h2>Nutrition Facts for {{nutrient_dict[name]['serving_size']}}g of {{name}}</h2>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">Nutrient</th>
-                            <th scope="col">Per Serving</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Energy</td>
-                            <td>{{nutrient_dict[name]['energy']}} kcal</td>
-                        </tr>
-                        <tr>
-                            <td>Protein</td>
-                            <td>{{nutrient_dict[name]['protein']}} grams</td>
-                        </tr>
-                        <tr>
-                            <td>Fat</td>
-                            <td>{{nutrient_dict[name]['fat']}} grams</td>
-                        </tr>
-                        <tr>
-                            <td>Carbohydrates</td>
-                            <td>{{nutrient_dict[name]['carbohydrates']}} grams</td>
-                        </tr>
-                        <!-- Assuming you want to include Dietary Fiber from the first translated table -->
-                        <tr>
-                            <td>Dietary Fiber</td>
-                            <td>{{nutrient_dict[name]['fiber']}} grams</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    {% endfor %}
+    <h2>Nutrition Results</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Food Name</th>
+                    <th>Mass (g)</th>
+                    <th>Energy (kcal)</th>
+                    <th>Protein (g)</th>
+                    <th>Fat (g)</th>
+                    <th>Carbohydrates (g)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in results %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.mass }}</td>
+                    <td>{{ item.energy }}</td>
+                    <td>{{ item.protein }}</td>
+                    <td>{{ item.fat }}</td>
+                    <td>{{ item.carbohydrates }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <th>Total</th>
+                    <th>{{ total_mass }}</th>
+                    <th>{{ total_energy }}</th>
+                    <th>{{ total_protein }}</th>
+                    <th>{{ total_fat }}</th>
+                    <th>{{ total_carbs }}</th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {% if 'username' in session %}
+    <form method="post" action="/add_to_tracking">
+        <input type="hidden" name="total_energy" value="{{ total_energy }}">
+        <input type="hidden" name="total_carbs" value="{{ total_carbs }}">
+        <input type="hidden" name="total_fat" value="{{ total_fat }}">
+        <input type="hidden" name="total_protein" value="{{ total_protein }}">
+        <button type="submit" class="btn btn-primary">Add to Tracking</button>
+    </form>
+    {% endif %}
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    var carousel = document.getElementById('imageCarousel');
-    var toggleButton = document.getElementById('toggleCarousel');
-
-    toggleButton.addEventListener('click', function() {
-        if (carousel.style.display === 'none') {
-            carousel.style.display = 'block';
-            toggleButton.textContent = 'Hide Images';
-        } else {
-            carousel.style.display = 'none';
-            toggleButton.textContent = 'Show Images';
-        }
-    });
-});
-</script>
-
-
 {% endblock %}
+

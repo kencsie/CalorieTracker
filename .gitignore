@@ -33,3 +33,6 @@ comment.txt
 **/website/data/pics/*
 **/website/data/depth_maps/*
 **/website/data/models/yolo.pt
+**/*.pkl
+**/*.pth
+**/runs

@@ -5,7 +5,7 @@ from urllib.parse import quote, unquote
 import json
 import os
 from dotenv import load_dotenv
-# import zukiPy
+import openai
 
 views = Blueprint('views', __name__)
 
@@ -111,6 +111,13 @@ def add_to_tracking():
             ]
         })
 
+    user_data['last_meal'] = {
+        'Calorie': "{:.2f}".format(total_energy),
+        'Carb': "{:.2f}".format(total_carbs),
+        'Fat': "{:.2f}".format(total_fat),
+        'Protein': "{:.2f}".format(total_protein)
+        }
+
     user_collection.update_one({"Username": session['username']}, {"$set": user_data})
     return redirect(url_for('views.tracking'))
 
@@ -184,22 +191,74 @@ def profile():
         user_data.pop('_id', None)  # Remove the '_id' since it's not JSON serializable
     return render_template('profile.html', user=user_data)
 
-# #Recommend route
-# @views.route('/recommend', methods=['GET', 'POST'])
-# async def index():
-#     load_dotenv()
-#     api_key = os.getenv("OPENAI_API_KEY")
-#     zukiAI = zukiPy.zukiCall(api_key, "gpt-4")
+#Recommend route
+@views.route('/recommend', methods=['GET', 'POST'])
+async def index():
+    def create_user_prompt():
+        if 'username' not in session:
+            return "User is required to login", 404
 
-#     if request.method == 'POST':
-#         prompt = request.form['prompt']
-#         if prompt:
-#             # If you want to experience it from zukijourney
-#             gpt_response = await zukiAI.zuki_chat.sendMessage(session['username'], prompt)
-#             print("Chat Response:", gpt_response)
-#             #with open('./website/static/user_response.txt', 'r', encoding='utf-8') as file:
-#             #    gpt_response = file.read()
-#             return render_template('recommend.html', prompt=prompt, response=gpt_response)
-    
+        mongo = PyMongo(current_app)
+        user_collection = mongo.db.User
+        user_data = user_collection.find_one({"Username": session['username']})
 
-#     return render_template('recommend.html', prompt='', response='')
+        if not user_data:
+            return "User data not found", 404 
+
+        #Fill in user info
+        user_data_dict = {
+            "age": user_data['age'],
+            "weight": user_data['weight'],
+            "height": user_data['height'],
+            "physical_activity_multiplier":  user_data['physical_activity_multiplier'],
+            "TDEE": user_data['TDEE'],
+            "weight_option": user_data['weight_option'],
+            "weight_option_amount": user_data['weight_option_amonut'],
+            "user_intake_calorie": user_data['last_meal']['Calorie'],
+            "user_intake_fat": user_data['last_meal']['Fat'],
+            "user_intake_protein": user_data['last_meal']['Protein'],
+            "user_intake_carb": user_data['last_meal']['Carb'],
+        }
+
+        with open('./website/data/prompt_template.txt', 'r') as file:
+            prompt = file.read()
+        filled_prompt = prompt.format(**user_data_dict)
+        
+        return filled_prompt
+
+
+    load_dotenv()
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    openai.api_base = os.getenv("OPENAI_BASE_PATH")
+
+    if request.method == 'POST':
+        chat_mode = request.form.get('chat_mode', 'chatgpt') 
+
+        if chat_mode == 'chatgpt':
+            prompt = request.form.get('prompt', None)
+            if not prompt:
+                prompt = 'Oh no! The user doesn\'t send any message.'
+        elif chat_mode == 'recommendation':
+            prompt = create_user_prompt()
+
+        if prompt:
+            # Provided from reverse proxy
+            chat_completion = openai.ChatCompletion.create(
+                stream=False, # can be true
+                model="gpt-3.5-turbo",  # "claude-2",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    },
+                ],
+            )
+            gpt_response = chat_completion.choices[0].message.content
+            print("Chat Response:", gpt_response)
+            # With static resposne
+            #with open('./website/static/user_response.txt', 'r', encoding='utf-8') as file:
+            #    gpt_response = file.read()
+            return render_template('recommend.html', prompt=prompt, response=gpt_response)
+
+
+    return render_template('recommend.html', prompt='', response='')

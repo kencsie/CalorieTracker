@@ -35,15 +35,25 @@
                             <input type="text" class="form-control" name="height" id="height" required>
                           </div>
                           <div class="form-group">
-                            <label for="physical_activity">Physical activity(number)<br>(1.Sedentary 2.Lightly active 3.Moderately active 4.Very active 5.Super active)</label>
-                            <input type="text" class="form-control" name="physical_activity" id="physical_activity" required>
+                            <label for="physical_activity">Physical activity</label>
+                            <select class="form-control" name="physical_activity" id="physical_activity" required>
+                              <option value="Sedentary">Sedentary</option>
+                              <option value="Lightly active">Lightly active</option>
+                              <option value="Moderately active">Moderately active</option>
+                              <option value="Very active">Very active</option>
+                              <option value="Super active">Super active</option>
+                            </select>                          
                           </div>
                           <div class="form-group">
-                            <label for="weight_option">Weight option(number)<br>(1.Increase 2.Maintain 3.Decrease)</label>
-                            <input type="text" class="form-control" name="weight_option" id="weight_option" required>
+                            <label for="weight_option">Weight option</label>
+                            <select class="form-control" name="weight_option" id="weight_option" required>
+                              <option value="Increase">Increase</option>
+                              <option value="Maintain">Maintain</option>
+                              <option value="Decrease">Decrease</option>
+                            </select>
                           </div>
                           <div class="form-group">
-                            <label for="weight_option_amount">Weight option(amount)<br></label>
+                            <label for="weight_option_amount">Weight option(kg)</label>
                             <input type="text" class="form-control" name="weight_option_amount" id="weight_option_amount" required>
                           </div>
                           <button type="submit" class="mt-3 btn btn-primary btn-block">Register</button>

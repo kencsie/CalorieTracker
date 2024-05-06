@@ -8,15 +8,16 @@ auth = Blueprint('auth', __name__)
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     def get_user_profile(gender, age, weight, height, physical_activity, weight_option, weight_option_amonut):
+        physical_activity_table = {'Sedentary':1.2, 'Lightly active':1.375, 'Moderately active':1.55, 'Very active':1.725, 'Super active':1.9}
+        
         age = float(age)
         weight = float(weight)
         height = float(height)
-        physical_activity = float(physical_activity)
-        weight_option_amonut = float(weight_option_amonut)
+        weight_option_amonut = float(weight_option_amonut) * 7700 / 30
 
         BMR_offset = 5 if gender == 'm' else -161
         BMR = (10 * weight) + (6.25 * height) - (5 * age) + BMR_offset
-        TDEE = BMR * physical_activity
+        TDEE = BMR * physical_activity_table[physical_activity]
 
         return {'gender':gender, 'age':age, 'weight':weight, 'height':height, 'physical_activity_multiplier':physical_activity, 'weight_option':weight_option, 'weight_option_amonut':weight_option_amonut, 'BMR':BMR, 'TDEE':TDEE}
 

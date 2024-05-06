@@ -233,6 +233,7 @@ def index():
 
 
     if request.method == 'POST':
+        #print(request.form)
         chat_mode = request.form.get('chat_mode', 'chatgpt') 
 
         if chat_mode == 'chatgpt':

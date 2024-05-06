@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, session, jsonify, request, redirect, url_for
+from flask import Blueprint, render_template, current_app, session, jsonify, request, redirect, url_for, Response, stream_with_context
 from flask_pymongo import PyMongo
 from datetime import datetime, timedelta
 from urllib.parse import quote, unquote
@@ -193,7 +193,7 @@ def profile():
 
 #Recommend route
 @views.route('/recommend', methods=['GET', 'POST'])
-async def index():
+def index():
     def create_user_prompt():
         if 'username' not in session:
             return "User is required to login", 404
@@ -231,6 +231,7 @@ async def index():
     openai.api_key = os.getenv("OPENAI_API_KEY")
     openai.api_base = os.getenv("OPENAI_BASE_PATH")
 
+
     if request.method == 'POST':
         chat_mode = request.form.get('chat_mode', 'chatgpt') 
 
@@ -244,7 +245,7 @@ async def index():
         if prompt:
             # Provided from reverse proxy
             chat_completion = openai.ChatCompletion.create(
-                stream=False, # can be true
+                stream=True, # can be true
                 model="gpt-3.5-turbo",  # "claude-2",
                 messages=[
                     {
@@ -253,12 +254,31 @@ async def index():
                     },
                 ],
             )
-            gpt_response = chat_completion.choices[0].message.content
-            print("Chat Response:", gpt_response)
+            
+            # Function to stream response
+            def generate():
+                try:
+                    for message in chat_completion:
+                        # Extract the content correctly from the nested structure
+                        if 'choices' in message and message['choices']:
+                            first_choice = message['choices'][0]  # Access the first choice
+                            if 'delta' in first_choice and 'content' in first_choice['delta']:
+                                content = first_choice['delta']['content']
+                            else:
+                                content = "No content available"
+                        else:
+                            content = "No choices available"
+
+                        #print(f"[{content}]")
+                        yield f"{content}"
+                except Exception as e:
+                    # Handle other exceptions that might occur
+                    yield f"data: Error during streaming: {str(e)}\n\n"
+
             # With static resposne
             #with open('./website/static/user_response.txt', 'r', encoding='utf-8') as file:
             #    gpt_response = file.read()
-            return render_template('recommend.html', prompt=prompt, response=gpt_response)
+            return Response(stream_with_context(generate()), content_type='text/event-stream')
 
 
     return render_template('recommend.html', prompt='', response='')

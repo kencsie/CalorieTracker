@@ -247,7 +247,7 @@ def index():
             # Provided from reverse proxy
             chat_completion = openai.ChatCompletion.create(
                 stream=True, # can be true
-                model="gpt-3.5-turbo",  # "claude-2",
+                model="gpt-4",  # "claude-2",
                 messages=[
                     {
                         "role": "user",
@@ -266,9 +266,9 @@ def index():
                             if 'delta' in first_choice and 'content' in first_choice['delta']:
                                 content = first_choice['delta']['content']
                             else:
-                                content = "No content available"
+                                content = ""
                         else:
-                            content = "No choices available"
+                            content = ""
 
                         #print(f"[{content}]")
                         yield f"{content}"

@@ -47,6 +47,7 @@ def upload_file():
             detected_object = {
                 'class': row['class'],
                 'name': row['name'],
+                'confidence': row['confidence'],
                 'bbox': [int(row['xmin']), int(row['ymin']), int(row['xmax']), int(row['ymax'])]
             }
             detected_objects.append(detected_object)
@@ -71,14 +72,16 @@ def upload_file():
 
         details = {}
         coin_image_area = None
+        confidence = 0
 
         for obj in bounding_boxes:
             bbox = np.array(obj['bbox'])
             masks, scores, _ = mask_predictor.predict(box=bbox, multimask_output=False)
             area = np.count_nonzero(masks[0])
             details[obj['name']] = {'mask': masks[0], 'image_area': area, 'object_id': obj['class']}
-            if obj['name'] == 'coin':
+            if obj['name'] == 'coin' and float(obj['confidence'])>confidence:
                 coin_image_area = area
+                confidence = float(obj['confidence'])
         
         if coin_image_area:
             scale_factor = real_coin_area / coin_image_area

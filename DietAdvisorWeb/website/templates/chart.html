@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Nutrient Intake Over the Last Week</h2>
+    <div>
+        <button id="btn-calories">Calories</button>
+        <button id="btn-carbs">Carbs</button>
+        <button id="btn-fats">Fats</button>
+        <button id="btn-proteins">Proteins</button>
+    </div>
+    <div class="chart-container" style="width: 400px; height: 400px; position: relative;">
+        <canvas id="nutrientChart"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Function to format date from 'YYYYMMDD' to 'YYYY/MM/DD'
+        function formatDate(dateStr) {
+            return dateStr.slice(0, 4) + '/' + dateStr.slice(4, 6) + '/' + dateStr.slice(6);
+        }
+        const formattedDates = {{ data.dates | tojson }}.map(dateStr => formatDate(dateStr));
+        const ctx = document.getElementById('nutrientChart').getContext('2d');
+        const nutrientChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ data.dates | tojson }},labels: formattedDates,
+                datasets: [{
+                    label: 'Calories',
+                    data: {{ data.calories | tojson }},
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Carbs',
+                    data: {{ data.carbs | tojson }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Fats',
+                    data: {{ data.fats | tojson }},
+                    backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Proteins',
+                    data: {{ data.proteins | tojson }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: false // This will hide the horizontal gridlines
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false // This will hide the vertical gridlines
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(tooltipItems) {
+                                let unit = "grams";
+                                if (tooltipItems.dataset.label === 'Calories') {
+                                    unit = "kcal"; // Use 'kcal' for calories
+                                }
+                                return tooltipItems.dataset.label + ': ' + tooltipItems.parsed.y + ' ' + unit;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    intersect: true
+                }
+            }
+        });
+
+        // Function to hide all datasets and show only the one that's selected
+        function showDataset(datasetIndex) {
+            nutrientChart.data.datasets.forEach((dataset, index) => {
+                const meta = nutrientChart.getDatasetMeta(index);
+                meta.hidden = index !== datasetIndex;
+            });
+            nutrientChart.update();
+        }
+
+        // Initialize with all datasets hidden
+        nutrientChart.data.datasets.forEach((dataset, index) => {
+            const meta = nutrientChart.getDatasetMeta(index);
+            meta.hidden = true;
+        });
+        nutrientChart.update();
+
+        // Setup buttons to show the respective dataset
+        document.getElementById('btn-calories').addEventListener('click', () => showDataset(0));
+        document.getElementById('btn-carbs').addEventListener('click', () => showDataset(1));
+        document.getElementById('btn-fats').addEventListener('click', () => showDataset(2));
+        document.getElementById('btn-proteins').addEventListener('click', () => showDataset(3));
+    </script>
+</div>
+{% endblock %}
+
+

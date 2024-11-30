@@ -1,0 +1,40 @@
+/* Custom Alerts CSS */
+.alert {
+  border-radius: 0.25rem;
+  border: none;
+  color: #000000;
+}
+
+.alert-success {
+  background-color: #28a745;
+}
+
+.alert-info {
+  background-color: #17a2b8;
+}
+
+.alert-warning {
+  background-color: #ffc107;
+  color: #0c0c0c; /* For better contrast */
+}
+
+.alert-error {
+  background-color: #dc3545;
+}
+
+.alert-dismissible .close {
+  color: #ffffff;
+  text-shadow: none;
+  opacity: 1;
+}
+
+/* Custom margin and padding for alerts */
+.my-4 {
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Stronger emphasis for the category */
+.alert strong {
+  font-weight: 700;
+}

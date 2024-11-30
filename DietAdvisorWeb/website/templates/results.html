@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <center>
+        <h1>Detection Results</h1>
+        <img src="{{ url_for('static', filename='results/' + image_name) }}" alt="Detection Result" class="img-fluid" style="max-width: 400px; height: auto;">
+    </center>
+    
+</div>
+<div class="container mt-4">
+    <h2>Nutrition Results</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Food Name</th>
+                    <th>Mass (g)</th>
+                    <th>Energy (kcal)</th>
+                    <th>Protein (g)</th>
+                    <th>Fat (g)</th>
+                    <th>Carbohydrates (g)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in results %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.mass }}</td>
+                    <td>{{ item.energy }}</td>
+                    <td>{{ item.protein }}</td>
+                    <td>{{ item.fat }}</td>
+                    <td>{{ item.carbohydrates }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <th>Total</th>
+                    <th>{{ total_mass }}</th>
+                    <th>{{ total_energy }}</th>
+                    <th>{{ total_protein }}</th>
+                    <th>{{ total_fat }}</th>
+                    <th>{{ total_carbs }}</th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {% if 'username' in session %}
+    <form method="post" action="/add_to_tracking">
+        <input type="hidden" name="total_energy" value="{{ total_energy }}">
+        <input type="hidden" name="total_carbs" value="{{ total_carbs }}">
+        <input type="hidden" name="total_fat" value="{{ total_fat }}">
+        <input type="hidden" name="total_protein" value="{{ total_protein }}">
+        <button type="submit" class="btn btn-primary">Add to Tracking</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h1 class="text-center mb-4">GPT-powered Recommend System</h1>
+        <form method="post" id="promptForm">
+            <div class="form-group">
+                <textarea class="form-control" name="prompt" rows="4" placeholder="Enter your prompt here..."></textarea>
+            </div>
+            <input type="hidden" name="chat_mode" id="chatModeInput"> <!-- Hidden input for chat_mode -->
+            <button type="button" class="mt-3 btn btn-primary btn-block" onclick="setChatMode('chatgpt')">Use as ChatGPT</button>
+            <button type="button" class="mt-3 btn btn-primary btn-block" onclick="setChatMode('recommendation')">Provide meal recommendation</button>
+            <br><button type="submit" class="mt-3 btn btn-primary btn-block">Submit</button>
+        </form>
+        <div class="mt-4">
+            <h2>Response:</h2>
+            <pre id="response-content" style="white-space: pre-wrap; background-color: rgb(238, 238, 238); padding: 15px;"></pre>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script>
+    function setChatMode(mode) {
+        document.getElementById('chatModeInput').value = mode;
+    }
+
+    document.getElementById('promptForm').onsubmit = function(event) {
+        event.preventDefault();
+        document.getElementById('response-content').innerHTML = ''; // Clear the response content on new submission
+        var formData = new FormData(this);
+        let accumulatedText = ''; // Initialize empty string to accumulate text
+
+        fetch('/recommend', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            const reader = response.body.getReader();
+            function read() {
+                return reader.read().then(({ done, value }) => {
+                    if (done) {
+                        console.log('Stream complete');
+                        // Process the entire accumulated text for Markdown formatting
+                        const html = marked.parse(accumulatedText);
+                        const safeHtml = DOMPurify.sanitize(html);
+                        document.getElementById('response-content').innerHTML = safeHtml;
+                        return;
+                    }
+                    const text = new TextDecoder().decode(value);
+                    accumulatedText += text; // Accumulate the chunks of text
+                    document.getElementById('response-content').textContent += text; // Display raw text as it arrives
+                    read();
+                });
+            }
+            read();
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
+    // Optional: Close fetch stream properly if needed
+    window.onbeforeunload = function() {
+        // Implement any needed cleanup
+    };
+</script>
+{% endblock %}

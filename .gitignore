@@ -1,0 +1,39 @@
+#Personal Matters
+push.sh
+pull.sh
+comment.txt
+
+#Ignore Dataset and model files
+**/Food-[0-9]/
+**/Food-[0-9][0-9]/
+**/Food-[0-9][0-9][0-9]/
+**/weights/
+**/yolov5
+
+#python files
+**/__pycache__
+**/.pytest_cache
+**/.ipynb_checkpoints
+
+#env variable
+**.env
+
+#Pictures
+**.png
+**/food_dataset
+
+#Depth-Anything
+**/metric_depth/checkpoints/
+**/metric_depth/data/
+**/metric_depth/depth_anything_finetune/
+**/metric_depth/wandb/
+
+#Web development
+**/website/data/sessions/*
+**/website/data/pics/*
+**/website/data/depth_maps/*
+**/website/data/models/yolo.pt
+**/*.pkl
+**/*.pth
+**/runs
+**/static/results/

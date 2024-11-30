@@ -1,0 +1,80 @@
+{
+  "Kabayaki sea bream fillet": {
+    "calorie": 127,
+    "protein": 18.3,
+    "fat": 3.2,
+    "carbohydrate": 6.2
+  },
+  "Apple -sliced-": {
+    "calorie": 52,
+    "protein": 0.26,
+    "fat": 0.17,
+    "carbohydrate": 13.81
+  },
+  "Cabbage": {
+    "calorie": 42,
+    "protein": 0.99,
+    "fat": 2.79,
+    "carbohydrate": 4.36
+  },
+  "Egg tofu": {
+    "calorie": 82.35,
+    "protein": 7.06,
+    "fat": 5.29,
+    "carbohydrate": 1.18
+  },
+  "Pig blood curd": {
+    "calorie": 29,
+    "protein": 6.3,
+    "fat": 0.3,
+    "carbohydrate": 0.5
+  },
+  "Rice":{
+    "calorie": 354,
+    "protein": 7,
+    "fat": 0.6,
+    "carbohydrate": 77.8
+  },
+  "Guava -sliced-":{
+    "calorie": 68,
+    "protein": 2.55,
+    "fat": 0.95,
+    "carbohydrate": 14.32
+  },
+  "Fried potato":{
+    "calorie": 125,
+    "protein": 2.41,
+    "fat": 3.25,
+    "carbohydrate": 22.05
+  },
+  "Pumpkin":{
+    "calorie": 46,
+    "protein": 1.08,
+    "fat": 1.75,
+    "carbohydrate": 7.94
+  },
+  "Creamy tofu":{
+    "calorie": 196,
+    "protein": 13.4,
+    "fat": 13.4,
+    "carbohydrate": 6.3
+  },
+  "Spam":{
+    "calorie": 292,
+    "protein": 15,
+    "fat": 24.3,
+    "carbohydrate": 3.2
+  },
+  "Fish cake":{
+    "calorie": 201,
+    "protein": 13.65,
+    "fat": 10.49,
+    "carbohydrate": 12.38
+  },
+  "Steamed egg":{
+    "calorie": 32,
+    "protein": 3.1,
+    "fat": 1.8,
+    "carbohydrate": 1.1
+  }
+}
